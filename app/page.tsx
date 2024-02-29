@@ -2,8 +2,20 @@ export const runtime = 'edge'
 import { URL } from '../constants'
 
 
-const image = "https://i.imgur.com/rJgpv2g.png"
-const buttonText1 = 'Get Free Stream'
+const myString = `|
+
+
+Welcome to Yoink Streams by Superfluid
+The stream follows the last Yoinker
+Start Yoinking below ↓
+
+
+|
+`;
+const myStringEncoded = encodeURIComponent(myString);
+const image = `https://api.imgbun.com/jpg?key=${process.env.IMGBUN_KEY}&text=${myStringEncoded}&color=FF0000&size=40&background=000000&format=raw`;
+const buttonText1 = '🔻 Start Yoinking'
+const buttonText2 = '🏆 Go to Learderboard'
 
 export default function Home() {
   return (
@@ -30,6 +42,9 @@ export async function generateMetadata() {
     'fc:frame:button:1:action': 'post',
     'fc:frame:button:1:target': `${URL}/check`,
     'fc:frame:post_url': `${URL}/check`,
+    'fc:frame:button:2': buttonText2,
+    'fc:frame:button:2:action': 'link',
+    'fc:frame:button:2:target': `https://app.superfluid.finance/`,
 
   }
 

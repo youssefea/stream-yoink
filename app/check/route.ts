@@ -1,12 +1,13 @@
 import { NextResponse } from "next/server";
-import { kv } from "@vercel/kv";
 import { followingQuery, walletQuery } from "../api";
 import { init, fetchQuery } from "@airstack/node";
 import { account, walletClient, publicClient } from "./config";
 import ABI from "./abi.json";
 
-const URL = process.env.ENVIRONMENT === 'local' ?
-  process.env.LOCALHOST : process.env.PROD_URL
+const URL =
+  process.env.ENVIRONMENT === "local"
+    ? process.env.LOCALHOST
+    : process.env.PROD_URL;
 
 // USDC contract address on Base
 const contractAddress = "0xcfA132E353cB4E398080B9700609bb008eceB125";
@@ -15,13 +16,27 @@ const USDCxAddress = "0xD04383398dD2426297da660F9CCA3d439AF9ce1b";
 init(process.env.AIRSTACK_KEY || "");
 
 let image;
-const notFollowingImage = "https://i.imgur.com/QGz0akJ.png";
-const final = "https://i.imgur.com/xk8IZag.png";
+let address;
+
+const myString = `|
+
+
+You are not following us !
+Follow to get your Yoinked Stream
+
+
+|
+`;
+const myStringEncoded = encodeURIComponent(myString);
+
+const notFollowingImage = `https://api.imgbun.com/jpg?key=${process.env.IMGBUN_KEY}&text=${myStringEncoded}&color=FF0000&size=40&background=000000&format=raw`;
 const noGreedImage = "https://i.imgur.com/V8StiET.png";
 
-const alreadyClaimed : any[] = [];
+const alreadyClaimed: any[] = [];
 
 image = notFollowingImage;
+
+const flowRate = 380517503805;
 
 const _html = (img, msg, action, url) => `
 <!DOCTYPE html>
@@ -56,32 +71,56 @@ export async function POST(req) {
     id: fid,
   });
 
-  const socials = results2.Socials.Social
-  const address = socials[0].userAssociatedAddresses[1]
+  const socials = results2.Socials.Social;
+  const newAddress = socials[0].userAssociatedAddresses[1];
 
   if (!results.Wallet.socialFollowers.Follower) {
-    return new NextResponse(_html(notFollowingImage, "Retry", "post", `${URL}`));
+    return new NextResponse(
+      _html(notFollowingImage, "Retry", "post", `${URL}`)
+    );
   }
 
-  if (alreadyClaimed.includes(fid)) {
-    return new NextResponse(_html(noGreedImage, "See in Dashboard", "link", `https://app.superfluid.finance/?view=${address}`));
-  }
+  const myYoinkerString = `|
 
-  image = final;
 
-  const flowRate = 380517503805
-  const { request } = await publicClient.simulateContract({
+  You are not following us !
+  Follow to get your Yoinked Stream
+
+
+  |
+  `;
+  const myStringEncoded = encodeURIComponent(myYoinkerString);
+  const Yoinker = `https://api.imgbun.com/jpg?key=${process.env.IMGBUN_KEY}&text=${myStringEncoded}&color=FF0000&size=40&background=000000&format=raw`;
+
+  const { request: deleteStream } = await publicClient.simulateContract({
+    address: contractAddress,
+    abi: ABI,
+    functionName: "setFlowrate",
+    account,
+    args: [USDCxAddress, address, 0],
+  });
+  await walletClient.writeContract(deleteStream);
+
+  address = newAddress;
+  const { request: startStream } = await publicClient.simulateContract({
     address: contractAddress,
     abi: ABI,
     functionName: "setFlowrate",
     account,
     args: [USDCxAddress, address, flowRate],
   });
-  await walletClient.writeContract(request);
+  await walletClient.writeContract(startStream);
 
   alreadyClaimed.push(fid);
 
-  return new NextResponse(_html(image, "See in Dashboard", "link", `https://app.superfluid.finance/?view=${address}`));
+  return new NextResponse(
+    _html(
+      image,
+      "See in Dashboard",
+      "link",
+      `https://app.superfluid.finance/?view=${address}`
+    )
+  );
 }
 
 export const dynamic = "force-dynamic";
