@@ -3,22 +3,17 @@ import { account} from "./check/config";
 export const followingQuery = (id) => `
 query isFollowing {
   Wallet(input: {identity: "fc_fid:${id}", blockchain: ethereum}) {
-    socialFollowers(
-      input: {filter: {identity: {_in: ["fc_fid:289345"]}}}
-    ) {
+    socialFollowers(input: {filter: {identity: {_in: ["fc_fid:289345"]}}}) {
       Follower {
         dappName
         dappSlug
         followingProfileId
         followerProfileId
-        followingAddress {
-          addresses
+        followerAddress {
           socials {
-            dappName
+            profileHandle
             profileName
-          }
-          domains {
-            name
+            dappName
           }
         }
       }
@@ -26,6 +21,8 @@ query isFollowing {
   }
 }
 `;
+
+
 
 export const walletQuery = (id) => `
 query GetAddressesOfFarcasters {
@@ -39,9 +36,9 @@ query GetAddressesOfFarcasters {
 
 export const lastYoinkedQuery = (receiverAddress) => `
 query GetLastYoinked {
-  account(id: "${account}") {
+  account(id: "${account.address.toLowerCase()}") {
     outflows(
-      where: {receiver: "${receiverAddress}", token_contains_nocase: "0x42bb40bF79730451B11f6De1CbA222F17b87Afd7"}
+      where: {receiver: "${receiverAddress.toLowerCase()}", token_contains_nocase: "0xD04383398dD2426297da660F9CCA3d439AF9ce1b"}
     ) {
       updatedAtTimestamp
       token {

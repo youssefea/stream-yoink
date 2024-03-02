@@ -1,5 +1,10 @@
 import { NextResponse } from "next/server";
-import { followingQuery, walletQuery, lastYoinkedQuery, fetchSubgraphData } from "../api";
+import {
+  followingQuery,
+  walletQuery,
+  lastYoinkedQuery,
+  fetchSubgraphData,
+} from "../api";
 import { init, fetchQuery } from "@airstack/node";
 import { account, walletClient, publicClient } from "./config";
 import ABI from "./abi.json";
@@ -15,30 +20,33 @@ const USDCxAddress = "0xD04383398dD2426297da660F9CCA3d439AF9ce1b";
 
 init(process.env.AIRSTACK_KEY || "");
 
-
-const notFollowingString = `|
-
-
-You are not following us !
-Follow to get your Yoinked Stream
-
-
-|
+const noConnectedString = `
+You don't have a connected wallet !\n
+Connect a wallet to your farcaster account
 `;
 
-const reyoinkedString = `|
+const notFollowingString = `
+You are not following us !\n
+Follow to get your Yoinked Stream
+`;
 
-You have to wait 2 hours to be able to yoink again !
+const reyoinkedString = `
+You have to wait 2 hours\n
+to be able to yoink again !
+`;
 
-|`;
+const congratsString= (userHandle) => `
+Congrats ${userHandle}\n
+you got your stream !
+`;
 
 function getImgUrl(myString: string) {
   const myStringEncoded = encodeURIComponent(myString);
-  return `https://api.imgbun.com/jpg?key=${process.env.IMGBUN_KEY}&text=${myStringEncoded}&color=FF0000&size=40&background=000000&format=raw`;
+  return `${URL}/imgen?text=${myStringEncoded}`;
 }
 
 const flowRate = 380517503805;
-let address = "0x72343b915f335b2af76ca703cf7a550c8701d5cd";
+let address = "0xD85b187B75fcD84341A0696D2FB3db575F1adE18";
 
 const _html = (img, msg, action, url) => `
 <!DOCTYPE html>
@@ -76,31 +84,50 @@ export async function POST(req) {
   const socials = results2.Socials.Social;
   const newAddress = socials[0].userAssociatedAddresses[1];
 
+  if (!newAddress) {
+    return new NextResponse(
+      _html(getImgUrl(noConnectedString), "Retry", "post", `${URL}`)
+    );
+  }
+
   if (!results.Wallet.socialFollowers.Follower) {
     return new NextResponse(
       _html(getImgUrl(notFollowingString), "Retry", "post", `${URL}`)
     );
   }
 
+
   const _query3 = lastYoinkedQuery(newAddress);
   const result3 = await fetchSubgraphData(_query3);
-  const lastYoink=result3.data.account.outflows[0].updatedAtTimestamp;
+  const lastYoink =
+    result3.data.account == null
+      ? 0
+      : result3.data.account.outflows[0].updatedAtTimestamp;
   const now = Date.now();
 
-  if (lastYoink+7200000>now) {
+  if (lastYoink + 7200000 > now) {
     return new NextResponse(
       _html(getImgUrl(reyoinkedString), "Retry", "post", `${URL}`)
     );
   }
 
-  const { request: deleteStream } = await publicClient.simulateContract({
+  const receiverCurrentFlowRate = await publicClient.readContract({
     address: contractAddress,
     abi: ABI,
-    functionName: "setFlowrate",
-    account,
-    args: [USDCxAddress, address, 0],
+    functionName: "getFlowrate",
+    args: [USDCxAddress, account.address, address],
   });
-  await walletClient.writeContract(deleteStream);
+
+  if (Number(receiverCurrentFlowRate)> 0) {
+    const { request: deleteStream } = await publicClient.simulateContract({
+      address: contractAddress,
+      abi: ABI,
+      functionName: "deleteFlow",
+      account,
+      args: [USDCxAddress, account.address, address, "0x0"],
+    });
+    await walletClient.writeContract(deleteStream);
+  }
 
   address = newAddress;
   const { request: startStream } = await publicClient.simulateContract({
@@ -108,15 +135,15 @@ export async function POST(req) {
     abi: ABI,
     functionName: "setFlowrate",
     account,
-    args: [USDCxAddress, address, flowRate],
+    args: [USDCxAddress, address, flowRate+1],
   });
   await walletClient.writeContract(startStream);
 
-  alreadyClaimed.push(fid);
+  const userHandle= results.Wallet.socialFollowers.Follower[0].socials[0].profileHandle;
 
   return new NextResponse(
     _html(
-      image,
+      getImgUrl(congratsString(userHandle)),
       "See in Dashboard",
       "link",
       `https://app.superfluid.finance/?view=${address}`
