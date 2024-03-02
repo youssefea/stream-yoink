@@ -2,18 +2,13 @@ export const runtime = 'edge'
 import { URL } from '../constants'
 
 
-const myString = `|
-
-
-Welcome to Yoink Streams by Superfluid
-The stream follows the last Yoinker
+const myString = `
+Welcome to\n Yoink Streams by Superfluid\n
+The stream follows the last Yoinker\n
 Start Yoinking below ↓
-
-
-|
 `;
 const myStringEncoded = encodeURIComponent(myString);
-const image = `https://api.imgbun.com/jpg?key=${process.env.IMGBUN_KEY}&text=${myStringEncoded}&color=FF0000&size=40&background=000000&format=raw`;
+const image = `${URL}/imgen?text=${myStringEncoded}`;
 const buttonText1 = '🔻 Start Yoinking'
 const buttonText2 = '🏆 Go to Learderboard'
 

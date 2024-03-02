@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { followingQuery, walletQuery } from "../api";
+import { followingQuery, walletQuery, lastYoinkedQuery, fetchSubgraphData } from "../api";
 import { init, fetchQuery } from "@airstack/node";
 import { account, walletClient, publicClient } from "./config";
 import ABI from "./abi.json";
@@ -15,10 +15,8 @@ const USDCxAddress = "0xD04383398dD2426297da660F9CCA3d439AF9ce1b";
 
 init(process.env.AIRSTACK_KEY || "");
 
-let image;
-let address;
 
-const myString = `|
+const notFollowingString = `|
 
 
 You are not following us !
@@ -27,16 +25,20 @@ Follow to get your Yoinked Stream
 
 |
 `;
-const myStringEncoded = encodeURIComponent(myString);
 
-const notFollowingImage = `https://api.imgbun.com/jpg?key=${process.env.IMGBUN_KEY}&text=${myStringEncoded}&color=FF0000&size=40&background=000000&format=raw`;
-const noGreedImage = "https://i.imgur.com/V8StiET.png";
+const reyoinkedString = `|
 
-const alreadyClaimed: any[] = [];
+You have to wait 2 hours to be able to yoink again !
 
-image = notFollowingImage;
+|`;
+
+function getImgUrl(myString: string) {
+  const myStringEncoded = encodeURIComponent(myString);
+  return `https://api.imgbun.com/jpg?key=${process.env.IMGBUN_KEY}&text=${myStringEncoded}&color=FF0000&size=40&background=000000&format=raw`;
+}
 
 const flowRate = 380517503805;
+let address = "0x72343b915f335b2af76ca703cf7a550c8701d5cd";
 
 const _html = (img, msg, action, url) => `
 <!DOCTYPE html>
@@ -76,21 +78,20 @@ export async function POST(req) {
 
   if (!results.Wallet.socialFollowers.Follower) {
     return new NextResponse(
-      _html(notFollowingImage, "Retry", "post", `${URL}`)
+      _html(getImgUrl(notFollowingString), "Retry", "post", `${URL}`)
     );
   }
 
-  const myYoinkerString = `|
+  const _query3 = lastYoinkedQuery(newAddress);
+  const result3 = await fetchSubgraphData(_query3);
+  const lastYoink=result3.data.account.outflows[0].updatedAtTimestamp;
+  const now = Date.now();
 
-
-  You are not following us !
-  Follow to get your Yoinked Stream
-
-
-  |
-  `;
-  const myStringEncoded = encodeURIComponent(myYoinkerString);
-  const Yoinker = `https://api.imgbun.com/jpg?key=${process.env.IMGBUN_KEY}&text=${myStringEncoded}&color=FF0000&size=40&background=000000&format=raw`;
+  if (lastYoink+7200000>now) {
+    return new NextResponse(
+      _html(getImgUrl(reyoinkedString), "Retry", "post", `${URL}`)
+    );
+  }
 
   const { request: deleteStream } = await publicClient.simulateContract({
     address: contractAddress,
