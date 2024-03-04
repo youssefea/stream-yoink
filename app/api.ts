@@ -38,7 +38,7 @@ export const lastYoinkedQuery = (receiverAddress) => `
 query GetLastYoinked {
   account(id: "${account.address.toLowerCase()}") {
     outflows(
-      where: {receiver: "${receiverAddress.toLowerCase()}", token_contains_nocase: "0xD04383398dD2426297da660F9CCA3d439AF9ce1b"}
+      where: {receiver: "${receiverAddress.toLowerCase()}", token_contains_nocase: "0xD6FAF98BeFA647403cc56bDB598690660D5257d2"}
     ) {
       updatedAtTimestamp
       token {
@@ -56,7 +56,7 @@ export async function fetchSubgraphData(myQuery) {
   };
 
   try {
-    const response = await fetch("https://base-mainnet.subgraph.x.superfluid.dev/", {
+    const response = await fetch("https://optimism-sepolia.subgraph.x.superfluid.dev/", {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

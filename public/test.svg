@@ -1,0 +1,20 @@
+<svg width="500" height="100" xmlns="http://www.w3.org/2000/svg">
+    <text x="10" y="50" font-family="Arial" font-size="48" fill="black">0</text>
+    <text x="60" y="50" font-family="Arial" font-size="48" fill="black">0</text>
+    <text x="110" y="50" font-family="Arial" font-size="48" fill="black">0</text>
+    
+    <!-- Units place (animates every second) -->
+    <text id="units" x="10" y="50" font-family="Arial" font-size="48" fill="red">
+        <set attributeName="class" to="round" begin="me.click" dur="2s" />
+    </text>
+    
+    <!-- Tens place (animates every 10 seconds) -->
+    <text id="tens" x="60" y="50" font-family="Arial" font-size="48" fill="green">
+      <animate attributeName="text" from="0" to="9" dur="100s" repeatCount="indefinite"/>
+    </text>
+    
+    <!-- Hundreds place (animates every 100 seconds) -->
+    <text id="hundreds" x="110" y="50" font-family="Arial" font-size="48" fill="blue">
+      <animate attributeName="text" from="0" to="9" dur="1000s" repeatCount="indefinite"/>
+    </text>
+  </svg>

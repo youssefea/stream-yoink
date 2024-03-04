@@ -16,7 +16,7 @@ const URL =
 
 // USDC contract address on Base
 const contractAddress = "0xcfA132E353cB4E398080B9700609bb008eceB125";
-const USDCxAddress = "0xD04383398dD2426297da660F9CCA3d439AF9ce1b";
+const USDCxAddress = "0xD6FAF98BeFA647403cc56bDB598690660D5257d2";
 
 init(process.env.AIRSTACK_KEY || "");
 
@@ -35,7 +35,7 @@ You have to wait 2 hours\n
 to be able to yoink again !
 `;
 
-const congratsString= (userHandle) => `
+const congratsString = (userHandle) => `
 Congrats ${userHandle}\n
 you got your stream !
 `;
@@ -96,16 +96,15 @@ export async function POST(req) {
     );
   }
 
-
   const _query3 = lastYoinkedQuery(newAddress);
   const result3 = await fetchSubgraphData(_query3);
   const lastYoink =
-    result3.data.account == null
+    result3.data.account.outflows[0] == null
       ? 0
       : result3.data.account.outflows[0].updatedAtTimestamp;
-  const now = Date.now();
+  const now = Math.round(Date.now()/1000);
 
-  if (lastYoink + 7200000 > now) {
+  if (Number(lastYoink)+7200000 > now) {
     return new NextResponse(
       _html(getImgUrl(reyoinkedString), "Retry", "post", `${URL}`)
     );
@@ -118,7 +117,8 @@ export async function POST(req) {
     args: [USDCxAddress, account.address, address],
   });
 
-  if (Number(receiverCurrentFlowRate)> 0) {
+
+  if (Number(receiverCurrentFlowRate) > 0) {
     const { request: deleteStream } = await publicClient.simulateContract({
       address: contractAddress,
       abi: ABI,
@@ -135,11 +135,14 @@ export async function POST(req) {
     abi: ABI,
     functionName: "setFlowrate",
     account,
-    args: [USDCxAddress, address, flowRate+1],
+    args: [USDCxAddress, address, flowRate],
   });
   await walletClient.writeContract(startStream);
 
-  const userHandle= results.Wallet.socialFollowers.Follower[0].socials[0].profileHandle;
+
+
+  const userHandle =
+  results.Wallet.socialFollowers.Follower[0].followerAddress.socials[0].profileHandle;
 
   return new NextResponse(
     _html(

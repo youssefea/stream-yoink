@@ -1,6 +1,27 @@
-// app/api/image/route.ts
+// Adjustments to your API route to include balance calculations
+
 import { NextRequest, NextResponse } from 'next/server';
 
+const test=`<svg width="500" height="100" xmlns="http://www.w3.org/2000/svg">
+<text x="10" y="50" font-family="Arial" font-size="48" fill="black">0</text>
+<text x="60" y="50" font-family="Arial" font-size="48" fill="black">0</text>
+<text x="110" y="50" font-family="Arial" font-size="48" fill="black">0</text>
+
+<!-- Units place (animates every second) -->
+<text id="units" x="10" y="50" font-family="Arial" font-size="48" fill="red">
+  <animate attributeName="text" from="0" to="9" dur="10s" repeatCount="indefinite"/>
+</text>
+
+<!-- Tens place (animates every 10 seconds) -->
+<text id="tens" x="60" y="50" font-family="Arial" font-size="48" fill="green">
+  <animate attributeName="text" from="0" to="9" dur="100s" repeatCount="indefinite"/>
+</text>
+
+<!-- Hundreds place (animates every 100 seconds) -->
+<text id="hundreds" x="110" y="50" font-family="Arial" font-size="48" fill="blue">
+  <animate attributeName="text" from="0" to="9" dur="1000s" repeatCount="indefinite"/>
+</text>
+</svg>`;
 
 const superfluidLogo = `<path fill-rule="evenodd" clip-rule="evenodd" d="M62.415 22.0661V14.4242H66.1397V22.37C66.1397 23.1611 66.3831 23.7953 66.8703 24.2736C67.3578 24.7517 67.9786 24.9911 68.7328 24.9911C69.4681 24.9911 70.0753 24.7469 70.5536 24.2597C71.0317 23.7725 71.2708 23.1422 71.2708 22.37V14.4242H74.9953V22.0661C74.9953 23.9422 74.4019 25.4692 73.2158 26.6458C72.0294 27.8233 70.5353 28.4117 68.7328 28.4117C66.8933 28.4117 65.3811 27.8278 64.1947 26.6594C63.0081 25.4917 62.415 23.9608 62.415 22.0661Z" fill="#12141E"/>
 <path fill-rule="evenodd" clip-rule="evenodd" d="M87.3239 21.2664C87.3239 20.1447 86.9933 19.2344 86.3308 18.5347C85.6692 17.8367 84.8225 17.4869 83.7931 17.4869C82.8 17.4869 81.9764 17.8181 81.3239 18.48C80.6706 19.1422 80.3444 20.0617 80.3444 21.2389C80.3444 22.4161 80.6706 23.3403 81.3239 24.0108C81.9764 24.6831 82.8 25.0183 83.7931 25.0183C84.8042 25.0183 85.6458 24.6692 86.3172 23.9697C86.9886 23.2708 87.3239 22.37 87.3239 21.2664ZM89.2136 16.1489C90.4733 17.5006 91.1036 19.1972 91.1036 21.2389C91.1036 23.2803 90.4733 24.9861 89.2136 26.3564C87.9542 27.7264 86.3769 28.4117 84.4825 28.4117C82.7719 28.4117 81.4108 27.86 80.3994 26.7564V33.0461H76.6753V14.4242H80.0961V16.1353C81.0342 14.7925 82.4961 14.1211 84.4825 14.1211C86.3769 14.1211 87.9542 14.7967 89.2136 16.1489Z" fill="#12141E"/>
@@ -16,7 +37,6 @@ const superfluidLogo = `<path fill-rule="evenodd" clip-rule="evenodd" d="M62.415
 <path fill-rule="evenodd" clip-rule="evenodd" d="M30.6978 23.5061H23.4586V16.2669H16.2192V9.0275H30.6978V23.5061ZM8.98 30.7453H16.2192V23.5061H8.98V30.7453ZM0 4.38417V35.3892C0 37.7839 1.94139 39.7256 4.33639 39.7256H35.3414C37.7364 39.7256 39.6778 37.7839 39.6778 35.3892V4.38417C39.6778 1.98917 37.7364 0.0477791 35.3414 0.0477791H4.33639C1.94139 0.0477791 0 1.98917 0 4.38417Z" fill="#12141E"/>
 `;
 
-// Helper function to create an SVG with text
 function generateSVG(text: string, color: string[], backgroundColor: string) {
     // Split text into lines
     const lines = text.split('\n'); // Assuming you use \n to indicate new lines in your text input
@@ -50,21 +70,50 @@ function generateSVG(text: string, color: string[], backgroundColor: string) {
     `;
   }
 
-export async function GET(request: NextRequest) {
+// Function to calculate the current balance
+function calculateCurrentBalance(startingBalance: bigint, flowRate: bigint, startingTime: Date): bigint {
+    const now = new Date();
+    const elapsedTimeInSeconds = (now.getTime() - startingTime.getTime()) / 1000;
+    // Ensure flowRate is divided by 1000 to convert ms to seconds correctly, and the result fits into the calculation
+    return startingBalance + (flowRate * BigInt(elapsedTimeInSeconds)) / BigInt(1000);
+  }
+  
+  export async function GET(request: NextRequest) {
+    const { searchParams } = request.nextUrl;
+  
+    // Ensure you convert query parameters to BigInt where necessary
+    // The parameters should be validated to ensure they are valid integers as strings
+    let startingBalance: bigint;
+    let flowRate: bigint;
+    try {
+      startingBalance = BigInt(searchParams.get('startingBalance') || '0');
+      flowRate = BigInt(searchParams.get('flowRate') || '100000000000000000');
+    } catch (error) {
+      // Handle invalid input
+      return new NextResponse('Invalid startingBalance or flowRate. Both must be integers.', { status: 400 });
+    }
+  
+    const startingDateString = searchParams.get('startingTime');
+    let startingTime = new Date();
+    if (startingDateString) {
+      startingTime = new Date(startingDateString);
+      if (isNaN(startingTime.getTime())) {
+        return new NextResponse('Invalid startingTime. Must be a valid date string.', { status: 400 });
+      }
+    }
+  
+    const currentBalance = calculateCurrentBalance(startingBalance, flowRate, startingTime);
+  
+    // Formatting the current balance for display
+    const displayBalance = currentBalance.toString(); // Adjust formatting as needed
 
-  const colorsArray = new Array(10).fill('black');
-  const { searchParams } = request.nextUrl;
-  const text = searchParams.get('text') || 'Default Text';
-  const color = searchParams.get('color')?.split(",") || colorsArray;
+  // Use displayBalance as the text for your SVG
+  const text = displayBalance;
+  const color = searchParams.get('color')?.split(",") || ['black']; // Default to black if not specified
   const backgroundColor = searchParams.get('background') || 'white';
 
-  // Validate inputs as needed
-  if (!text) {
-    return new NextResponse('Query parameter "text" is required', { status: 400 });
-  }
-
   const svg = generateSVG(text, color, backgroundColor);
-  return new NextResponse(svg, {
+  return new NextResponse(test, {
     status: 200,
     headers: {
       'Content-Type': 'image/svg+xml',
@@ -73,5 +122,4 @@ export async function GET(request: NextRequest) {
   });
 }
 
-// Force the function to be considered dynamic to bypass any caching
 export const dynamic = 'force-dynamic';
