@@ -65,7 +65,7 @@ export async function POST(req) {
       _html(getImgUrl(notFollowingString), "Retry", "post", `${URL}`)
     );
   }
-  const fetchData = await fetch('/currentYoinkerApi');
+  const fetchData = await fetch(`${URL}/currentYoinkerApi`);
   const fetchDataJson=await fetchData.json();
   const currentYoinker=fetchDataJson.profileHandle;
 
