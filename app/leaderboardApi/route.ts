@@ -4,6 +4,7 @@ import { NextResponse } from 'next/server';
 import { kv } from '@vercel/kv';
 
 export async function GET(req) {
+  noStore()
   try {
     // Fetch the sorted leaderboard data directly from KV
     const leaderboardData = await kv.zrange('yoinkedStreams', 0, 10000, { withScores: true });
