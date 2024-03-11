@@ -10,6 +10,7 @@ import { init, fetchQuery } from "@airstack/node";
 import { account, walletClient, publicClient } from "./config";
 import ABI from "./abi.json";
 import {kv} from "@vercel/kv";
+import { assert } from "console";
 
 const URL =
   process.env.ENVIRONMENT === "local"
@@ -36,7 +37,6 @@ function getImgUrl(myString: string) {
 }
 
 const flowRate = 380517503805;
-let address = "0xD85b187B75fcD84341A0696D2FB3db575F1adE18";
 
 const _html = (img, msg, action, url) => `
 <!DOCTYPE html>
@@ -75,7 +75,6 @@ export async function POST(req) {
   const newAddress = socials[0].userAssociatedAddresses[1];
   const userHandle =
   results.Wallet.socialFollowers.Follower[0].followerAddress.socials[0].profileHandle;
-  console.log(userHandle)
 
   if (!newAddress) {
     return new NextResponse(
@@ -84,15 +83,12 @@ export async function POST(req) {
   }
 
   const _query3 = lastYoinkedQuery(newAddress);
-  const result3 = await fetchSubgraphData(_query3);
+  const result3: any = await fetchSubgraphData(_query3);
   const lastYoink =
     result3.data.account.outflows[0] == null
       ? 0
       : result3.data.account.outflows[0].updatedAtTimestamp;
   const now = Math.round(Date.now()/1000);
-
-  console.log(Number(lastYoink)+7200)
-  console.log(now)
 
   if (Number(lastYoink)+7200 > now) {
     return new NextResponse(
@@ -100,11 +96,15 @@ export async function POST(req) {
     );
   }
 
+  const fetchData = await fetch(`${URL}/currentYoinkerApi`);
+  const fetchDataJson=await fetchData.json();
+  const currentYoinkerAddress=fetchDataJson.address;
+
   const receiverCurrentFlowRate = await publicClient.readContract({
     address: contractAddress,
     abi: ABI,
     functionName: "getFlowrate",
-    args: [USDCxAddress, account.address, address],
+    args: [USDCxAddress, account.address, currentYoinkerAddress],
   });
 
   if (Number(receiverCurrentFlowRate) > 0) {
@@ -113,29 +113,31 @@ export async function POST(req) {
       abi: ABI,
       functionName: "deleteFlow",
       account,
-      args: [USDCxAddress, account.address, address, "0x0"],
+      args: [USDCxAddress, account.address, currentYoinkerAddress, "0x0"],
     });
     await walletClient.writeContract(deleteStream);
   }
 
-  address = newAddress;
+  const sleep = (ms) => new Promise(r => setTimeout(r, ms));
+  await sleep(200);
+
   const { request: startStream } = await publicClient.simulateContract({
     address: contractAddress,
     abi: ABI,
     functionName: "setFlowrate",
     account,
-    args: [USDCxAddress, address, flowRate],
+    args: [USDCxAddress, newAddress, flowRate],
   });
   await walletClient.writeContract(startStream);
 
-  await updateProfileData(userHandle, address);
+  await updateProfileData(userHandle, newAddress);
 
   return new NextResponse(
     _html(
       getImgUrl(congratsString(userHandle)),
       "See in Dashboard",
       "link",
-      `https://app.superfluid.finance/?view=${address}`
+      `https://app.superfluid.finance/?view=${newAddress}`
     )
   );
 }

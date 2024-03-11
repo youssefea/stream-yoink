@@ -6,6 +6,7 @@ export async function GET() {
   try {
     // Fetch the profileHandle of the current yoinker
     const profileHandle = await kv.hget('currentYoinker', 'profileHandle');
+    const address= await kv.hget('currentYoinker', 'address');
 
     // If profileHandle is not found, return a meaningful error response
     if (!profileHandle) {
@@ -18,7 +19,7 @@ export async function GET() {
     }
 
     // Use NextResponse to return the profileHandle
-    return new NextResponse(JSON.stringify({ profileHandle }), {
+    return new NextResponse(JSON.stringify({ profileHandle, address }), {
       status: 200, // OK status
       headers: {
         'Content-Type': 'application/json', // Specify the content type
