@@ -17,9 +17,9 @@ const superfluidLogo = `<path fill-rule="evenodd" clip-rule="evenodd" d="M62.415
 `;
 
 // Helper function to create an SVG with text
-function generateSVG(text: string, color: string[], backgroundColor: string) {
+function generateSVG(text: string, color: string[], backgroundColor: string, size: string[]) {
     // Split text into lines
-    const lines = text.split('\n'); // Assuming you use \n to indicate new lines in your text input
+    const lines = text.split('_'); // Assuming you use \n to indicate new lines in your text input
     const lineHeight = 18; // Adjust line height as needed
     const startingY = 20; // Adjust starting Y position based on number of lines to keep it centered
   
@@ -31,12 +31,14 @@ function generateSVG(text: string, color: string[], backgroundColor: string) {
         dominant-baseline="middle" 
         text-anchor="middle" 
         font-family="Helvetica" 
-        font-size="12" 
+        font-size="${size[index] || 10}" 
         fill="${color[index]}"
       >
         ${line}
       </text>
     `).join('');
+
+    
   
     // SVG template with text and simple styling, including logo transformation
     return `
@@ -52,10 +54,10 @@ function generateSVG(text: string, color: string[], backgroundColor: string) {
 
 export async function GET(request: NextRequest) {
 
-  const colorsArray = new Array(10).fill('black');
   const { searchParams } = request.nextUrl;
   const text = searchParams.get('text') || 'Default Text';
-  const color = searchParams.get('color')?.split(",") || colorsArray;
+  const color = searchParams.get('color')?.split(",") || new Array(10).fill('black');
+  const size = request.nextUrl.searchParams.get('size')?.split(",") || new Array(10).fill('12');
   const backgroundColor = searchParams.get('background') || 'white';
 
   // Validate inputs as needed
@@ -63,7 +65,7 @@ export async function GET(request: NextRequest) {
     return new NextResponse('Query parameter "text" is required', { status: 400 });
   }
 
-  const svg = generateSVG(text, color, backgroundColor);
+  const svg = generateSVG(text, color, backgroundColor, size);
   return new NextResponse(svg, {
     status: 200,
     headers: {

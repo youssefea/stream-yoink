@@ -105,7 +105,7 @@ export async function POST(req) {
       : result3.data.account.outflows[0].updatedAtTimestamp;
   const now = Math.round(Date.now()/1000);
 
-  console.log(Number(lastYoink)+7200000)
+  console.log(Number(lastYoink)+7200)
   console.log(now)
 
   if (Number(lastYoink)+7200 > now) {

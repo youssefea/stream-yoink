@@ -15,19 +15,13 @@ const URL =
 
 init(process.env.AIRSTACK_KEY || "");
 
-const notFollowingString = `
-Follow @superfluid !\n
-to yoink the stream
-`;
+const notFollowingString = `_@superfluid !__Follow us__and start Yoinking!`;
 
-const welcomeString = (yoinker) => `
-${yoinker} has the stream !\n
-You can Yoink your Stream below
-`;
+const welcomeString = (yoinker) => `_${yoinker}__has the stream !__You can Yoink your Stream below ↓`;
 
 function getImgUrl(myString: string) {
   const myStringEncoded = encodeURIComponent(myString);
-  return `${URL}/imgen?text=${myStringEncoded}`;
+  return `${URL}/imgen?text=${myStringEncoded}&color=black,green,black,black,black&size=12,18`;
 }
 
 const _html = (img, msg, action, url) => `

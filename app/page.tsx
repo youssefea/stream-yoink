@@ -2,12 +2,10 @@ export const runtime = 'edge'
 import { URL } from '../constants'
 
 
-const myString = `
-StreamYoink!\n
-Click below to start your stream ↓
+const myString = `_StreamYoink!__Welcome to StreamYoink!__Click below to start your stream ↓
 `;
 const myStringEncoded = encodeURIComponent(myString);
-const image = `${URL}/imgen?text=${myStringEncoded}`;
+const image = `${URL}/imgen?text=${myStringEncoded}&color=black,green,black,black,black&size=12,18`;
 const buttonText1 = '🔻 Start Yoinking'
 const buttonText2 = '🏆 Go to Learderboard'
 
@@ -38,7 +36,7 @@ export async function generateMetadata() {
     'fc:frame:post_url': `${URL}/start`,
     'fc:frame:button:2': buttonText2,
     'fc:frame:button:2:action': 'link',
-    'fc:frame:button:2:target': `https://app.superfluid.finance/`,
+    'fc:frame:button:2:target': `https://sf-frame-3.vercel.app/leaderboard`,
 
   }
 
