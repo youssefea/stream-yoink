@@ -72,6 +72,8 @@ export async function POST(req) {
 
   const socials = results2.Socials.Social;
   const newAddress = socials[0].userAssociatedAddresses[1];
+  const userHandle =
+  results.Wallet.socialFollowers.Follower[0].followerAddress.socials[0].profileHandle;
 
   if (!newAddress) {
     return new NextResponse(
@@ -98,7 +100,7 @@ export async function POST(req) {
 
   if (Number(lastYoink)+7200 > now) {
     return new NextResponse(
-      _html(getImgUrl(reyoinkedString), "Retry", "post", `${URL}`)
+      _html(getImgUrl(reyoinkedString(userHandle)), "Retry", "post", `${URL}`)
     );
   }
 
@@ -129,9 +131,6 @@ export async function POST(req) {
     args: [USDCxAddress, address, flowRate],
   });
   await walletClient.writeContract(startStream);
-
-  const userHandle =
-  results.Wallet.socialFollowers.Follower[0].followerAddress.socials[0].profileHandle;
 
   await kv.hset('currentYoinker', { profileHandle: userHandle, address: address});
   await kv.zincrby('yoinkedStreams', 1, userHandle);
