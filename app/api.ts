@@ -1,4 +1,10 @@
 import { account} from "./check/config";
+import fetch from 'node-fetch';
+
+const URL =
+  process.env.ENVIRONMENT === "local"
+    ? process.env.LOCALHOST
+    : process.env.PROD_URL;
 
 export const followingQuery = (id) => `
 query isFollowing {
@@ -75,5 +81,31 @@ export async function fetchSubgraphData(myQuery) {
   } catch (error) {
     console.error('There was a problem with your fetch operation:', error);
     throw error; // Rethrow or handle as needed
+  }
+}
+
+
+// sender.ts - Example of sending data from another TypeScript file
+// Use this line if you're in Node.js and have installed node-fetch
+
+export async function updateProfileData(profileHandle: string, address: string) {
+  const url = `${URL}/currentYoinkerPost`; // Replace with your actual API endpoint
+  try {
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ profileHandle, address }),
+    });
+
+    if (!response.ok) {
+      throw new Error('Network response was not ok');
+    }
+
+    const data = await response.json();
+    console.log('Success:', data);
+  } catch (error) {
+    console.error('Error:', error);
   }
 }

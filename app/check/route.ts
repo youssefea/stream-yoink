@@ -4,6 +4,7 @@ import {
   walletQuery,
   lastYoinkedQuery,
   fetchSubgraphData,
+  updateProfileData
 } from "../api";
 import { init, fetchQuery } from "@airstack/node";
 import { account, walletClient, publicClient } from "./config";
@@ -74,6 +75,7 @@ export async function POST(req) {
   const newAddress = socials[0].userAssociatedAddresses[1];
   const userHandle =
   results.Wallet.socialFollowers.Follower[0].followerAddress.socials[0].profileHandle;
+  console.log(userHandle)
 
   if (!newAddress) {
     return new NextResponse(
@@ -126,8 +128,7 @@ export async function POST(req) {
   });
   await walletClient.writeContract(startStream);
 
-  await kv.hset('currentYoinker', { profileHandle: userHandle, address: address});
-  await kv.zincrby('yoinkedStreams', 1, userHandle);
+  await updateProfileData(userHandle, address);
 
   return new NextResponse(
     _html(
