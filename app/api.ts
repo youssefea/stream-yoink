@@ -3,7 +3,7 @@ import { account} from "./check/config";
 export const followingQuery = (id) => `
 query isFollowing {
   Wallet(input: {identity: "fc_fid:${id}", blockchain: ethereum}) {
-    socialFollowers(input: {filter: {identity: {_in: ["fc_fid:289345"]}}}) {
+    socialFollowers(input: {filter: {identity: {_in: ["fc_fid:315653"]}}}) {
       Follower {
         dappName
         dappSlug
