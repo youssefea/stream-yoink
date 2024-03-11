@@ -28,8 +28,9 @@ export default function LeaderboardPage() {
             score: leaderboardData[i + 1] as number,
           });
         }
-        setLeaderboard(parsedLeaderboardData);
-
+        // Reverse the array to correct the ranking order
+        setLeaderboard(parsedLeaderboardData.reverse());
+  
         // Fetch current yoinker data
         const currentYoinkerResponse = await fetch('/currentYoinkerApi');
         const currentYoinkerData: CurrentYoinker = await currentYoinkerResponse.json();
@@ -38,7 +39,7 @@ export default function LeaderboardPage() {
         console.error('Failed to fetch data:', error);
       }
     };
-
+  
     fetchData();
   }, []);
 
