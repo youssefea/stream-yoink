@@ -2,7 +2,7 @@ export const runtime = 'edge'
 import { URL } from '../constants'
 
 
-const myString = `_StreamYoink!__Welcome to StreamYoink!__Click below to start your stream ↓
+const myString = `_StreamYoink!__Welcome to StreamYoink!__Click below to start yoinking ↓
 `;
 const myStringEncoded = encodeURIComponent(myString);
 const image = `${URL}/imgen?text=${myStringEncoded}&color=black,green,black,black,black&size=12,18`;

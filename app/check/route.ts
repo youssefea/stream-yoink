@@ -21,29 +21,17 @@ const USDCxAddress = "0xD6FAF98BeFA647403cc56bDB598690660D5257d2";
 
 init(process.env.AIRSTACK_KEY || "");
 
-const noConnectedString = `
-You don't have a connected wallet !\n
-Connect a wallet to your farcaster account
-`;
+const noConnectedString = `_StreamYoink__You don't have a connected wallet !__Connect a wallet to your farcaster account`;
 
-const notFollowingString = `
-You are not following us !\n
-Follow to get your Yoinked Stream
-`;
+const notFollowingString = `_@superfluid__Follow us__and start Yoinking!`;
 
-const reyoinkedString = `
-You have to wait 2 hours\n
-to be able to yoink again !
-`;
+const reyoinkedString = (userHandle)=> `_${userHandle}__You have to wait 2 hours__to be able to yoink again !`;
 
-const congratsString = (userHandle) => `
-Congrats ${userHandle}\n
-you got your stream !
-`;
+const congratsString = (userHandle) => `_${userHandle}_Congrats!_you hold the yoink stream !`;
 
 function getImgUrl(myString: string) {
   const myStringEncoded = encodeURIComponent(myString);
-  return `${URL}/imgen?text=${myStringEncoded}`;
+  return `${URL}/imgen?text=${myStringEncoded}&color=black,green,black,black,black&size=12,18`;
 }
 
 const flowRate = 380517503805;

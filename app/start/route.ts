@@ -15,7 +15,7 @@ const URL =
 
 init(process.env.AIRSTACK_KEY || "");
 
-const notFollowingString = `_@superfluid !__Follow us__and start Yoinking!`;
+const notFollowingString = `_@superfluid__Follow us__and start Yoinking!`;
 
 const welcomeString = (yoinker) => `_${yoinker}__has the stream !__You can Yoink your Stream below ↓`;
 
