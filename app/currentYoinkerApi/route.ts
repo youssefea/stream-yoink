@@ -1,8 +1,12 @@
 // app/currentYoinkerApi/route.ts
+'use server'
+import { unstable_noStore as noStore } from 'next/cache';
+
 import { NextResponse } from 'next/server';
 import { kv } from '@vercel/kv';
 
 export async function GET() {
+  noStore()
   try {
     // Fetch the profileHandle of the current yoinker
     const profileHandle = await kv.hget('currentYoinker', 'profileHandle');

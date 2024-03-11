@@ -4,12 +4,12 @@ import {
   walletQuery,
   lastYoinkedQuery,
   fetchSubgraphData,
-  updateProfileData
+  updateProfileData,
 } from "../api";
 import { init, fetchQuery } from "@airstack/node";
 import { account, walletClient, publicClient } from "./config";
 import ABI from "./abi.json";
-import {kv} from "@vercel/kv";
+import { kv } from "@vercel/kv";
 import { assert } from "console";
 
 const URL =
@@ -27,9 +27,11 @@ const noConnectedString = `_StreamYoink__You don't have a connected wallet !__Co
 
 const notFollowingString = `_@superfluid__Follow us__and start Yoinking!`;
 
-const reyoinkedString = (userHandle)=> `_${userHandle}__You have to wait 2 hours__to be able to yoink again !`;
+const reyoinkedString = (userHandle) =>
+  `_${userHandle}__You have to wait 2 hours__to be able to yoink again !`;
 
-const congratsString = (userHandle) => `_${userHandle}_Congrats!_you hold the yoink stream !`;
+const congratsString = (userHandle) =>
+  `_${userHandle}_Congrats!_you hold the yoink stream !`;
 
 function getImgUrl(myString: string) {
   const myStringEncoded = encodeURIComponent(myString);
@@ -74,7 +76,8 @@ export async function POST(req) {
   const socials = results2.Socials.Social;
   const newAddress = socials[0].userAssociatedAddresses[1];
   const userHandle =
-  results.Wallet.socialFollowers.Follower[0].followerAddress.socials[0].profileHandle;
+    results.Wallet.socialFollowers.Follower[0].followerAddress.socials[0]
+      .profileHandle;
 
   if (!newAddress) {
     return new NextResponse(
@@ -88,37 +91,40 @@ export async function POST(req) {
     result3.data.account.outflows[0] == null
       ? 0
       : result3.data.account.outflows[0].updatedAtTimestamp;
-  const now = Math.round(Date.now()/1000);
+  const now = Math.round(Date.now() / 1000);
 
-  if (Number(lastYoink)+7200 > now) {
+  if (Number(lastYoink) + 7200 > now) {
     return new NextResponse(
       _html(getImgUrl(reyoinkedString(userHandle)), "Retry", "post", `${URL}`)
     );
   }
 
   const fetchData = await fetch(`${URL}/currentYoinkerApi`);
-  const fetchDataJson=await fetchData.json();
-  const currentYoinkerAddress=fetchDataJson.address;
+  const fetchDataJson = await fetchData.json();
+  const currentYoinkerAddress = fetchDataJson.address;
+  console.log(currentYoinkerAddress);
 
-  const receiverCurrentFlowRate = await publicClient.readContract({
-    address: contractAddress,
-    abi: ABI,
-    functionName: "getFlowrate",
-    args: [USDCxAddress, account.address, currentYoinkerAddress],
-  });
-
-  if (Number(receiverCurrentFlowRate) > 0) {
-    const { request: deleteStream } = await publicClient.simulateContract({
+  if (currentYoinkerAddress != null) {
+    const receiverCurrentFlowRate = await publicClient.readContract({
       address: contractAddress,
       abi: ABI,
-      functionName: "deleteFlow",
-      account,
-      args: [USDCxAddress, account.address, currentYoinkerAddress, "0x0"],
+      functionName: "getFlowrate",
+      args: [USDCxAddress, account.address, currentYoinkerAddress],
     });
-    await walletClient.writeContract(deleteStream);
+
+    if (Number(receiverCurrentFlowRate) > 0) {
+      const { request: deleteStream } = await publicClient.simulateContract({
+        address: contractAddress,
+        abi: ABI,
+        functionName: "deleteFlow",
+        account,
+        args: [USDCxAddress, account.address, currentYoinkerAddress, "0x0"],
+      });
+      await walletClient.writeContract(deleteStream);
+    }
   }
 
-  const sleep = (ms) => new Promise(r => setTimeout(r, ms));
+  const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
   await sleep(200);
 
   const { request: startStream } = await publicClient.simulateContract({

@@ -1,4 +1,5 @@
-// app/leaderboardApi/route.ts
+'use server'
+import { unstable_noStore as noStore } from 'next/cache';
 import { NextResponse } from 'next/server';
 import { kv } from '@vercel/kv';
 
