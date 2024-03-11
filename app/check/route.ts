@@ -81,12 +81,6 @@ export async function POST(req) {
     );
   }
 
-  if (!results.Wallet.socialFollowers.Follower) {
-    return new NextResponse(
-      _html(getImgUrl(notFollowingString), "Retry", "post", `${URL}`)
-    );
-  }
-
   const _query3 = lastYoinkedQuery(newAddress);
   const result3 = await fetchSubgraphData(_query3);
   const lastYoink =

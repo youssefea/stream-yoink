@@ -65,7 +65,10 @@ export async function POST(req) {
       _html(getImgUrl(notFollowingString), "Retry", "post", `${URL}`)
     );
   }
-  const currentYoinker = await kv.hget("currentYoinker", "profileHandle");
+  const fetchData = await fetch('/currentYoinkerApi');
+  const fetchDataJson=await fetchData.json();
+  const currentYoinker=fetchDataJson.profileHandle;
+
   return new NextResponse(
     _html(
       getImgUrl(welcomeString(currentYoinker)),
