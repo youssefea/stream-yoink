@@ -52,6 +52,9 @@ const _html = (img, msg, action, url) => `
     <meta property="fc:frame:button:1" content="${msg}" />
     <meta property="fc:frame:button:1:action" content="${action}" />
     <meta property="fc:frame:button:1:target" content="${url}" />
+    <meta property="fc:frame:button:2" content="🏆 Go to Learderboard" />
+    <meta property="fc:frame:button:2:action" content="link" />
+    <meta property="fc:frame:button:2:target" content="https://sf-frame-3.vercel.app/leaderboard" />
     <meta property="fc:frame:post_url" content="${url}" />
   </head>
 </html>
@@ -81,7 +84,7 @@ export async function POST(req) {
 
   if (!newAddress) {
     return new NextResponse(
-      _html(getImgUrl(noConnectedString), "Retry", "post", `${URL}`)
+      _html(getImgUrl(noConnectedString), "Retry 🔁", "post", `${URL}`)
     );
   }
 
@@ -93,9 +96,9 @@ export async function POST(req) {
       : result3.data.account.outflows[0].updatedAtTimestamp;
   const now = Math.round(Date.now() / 1000);
 
-  if (Number(lastYoink) + 7200 > now) {
+  if (Number(lastYoink)+7200 > now) {
     return new NextResponse(
-      _html(getImgUrl(reyoinkedString(userHandle)), "Retry", "post", `${URL}`)
+      _html(getImgUrl(reyoinkedString(userHandle)), "Retry 🔁", "post", `${URL}`)
     );
   }
 
@@ -104,44 +107,45 @@ export async function POST(req) {
   const currentYoinkerAddress = fetchDataJson.address;
   console.log(currentYoinkerAddress);
 
-  if (currentYoinkerAddress != null) {
-    const receiverCurrentFlowRate = await publicClient.readContract({
-      address: contractAddress,
-      abi: ABI,
-      functionName: "getFlowrate",
-      args: [USDCxAddress, account.address, currentYoinkerAddress],
-    });
-
-    if (Number(receiverCurrentFlowRate) > 0) {
-      const { request: deleteStream } = await publicClient.simulateContract({
+  if (currentYoinkerAddress != newAddress) {
+    if (currentYoinkerAddress != null) {
+      const receiverCurrentFlowRate = await publicClient.readContract({
         address: contractAddress,
         abi: ABI,
-        functionName: "deleteFlow",
-        account,
-        args: [USDCxAddress, account.address, currentYoinkerAddress, "0x0"],
+        functionName: "getFlowrate",
+        args: [USDCxAddress, account.address, currentYoinkerAddress],
       });
-      await walletClient.writeContract(deleteStream);
+
+      if (Number(receiverCurrentFlowRate) > 0) {
+        const { request: deleteStream } = await publicClient.simulateContract({
+          address: contractAddress,
+          abi: ABI,
+          functionName: "deleteFlow",
+          account,
+          args: [USDCxAddress, account.address, currentYoinkerAddress, "0x0"],
+        });
+        await walletClient.writeContract(deleteStream);
+      }
     }
+
+    const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+    await sleep(200);
+    const { request: startStream } = await publicClient.simulateContract({
+      address: contractAddress,
+      abi: ABI,
+      functionName: "setFlowrate",
+      account,
+      args: [USDCxAddress, newAddress, flowRate],
+    });
+    await walletClient.writeContract(startStream);
   }
-
-  const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
-  await sleep(200);
-
-  const { request: startStream } = await publicClient.simulateContract({
-    address: contractAddress,
-    abi: ABI,
-    functionName: "setFlowrate",
-    account,
-    args: [USDCxAddress, newAddress, flowRate],
-  });
-  await walletClient.writeContract(startStream);
 
   await updateProfileData(userHandle, newAddress);
 
   return new NextResponse(
     _html(
-      getImgUrl(congratsString(userHandle)),
-      "See in Dashboard",
+      `${URL}/flowingBalance?user=${userHandle}&balance=0.0001`,
+      "See in Dashboard 🌊",
       "link",
       `https://app.superfluid.finance/?view=${newAddress}`
     )

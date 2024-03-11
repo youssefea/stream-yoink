@@ -17,11 +17,11 @@ init(process.env.AIRSTACK_KEY || "");
 
 const notFollowingString = `_@superfluid__Follow us__and start Yoinking!`;
 
-const welcomeString = (yoinker) => `_${yoinker}__has the stream !__You can Yoink your Stream below ↓`;
+const welcomeString = (yoinker, totalYoinked) => `_${yoinker}_has the stream !_The stream has been Yoinked_${totalYoinked} times__You can Yoink your Stream below ↓`;
 
 function getImgUrl(myString: string) {
   const myStringEncoded = encodeURIComponent(myString);
-  return `${URL}/imgen?text=${myStringEncoded}&color=black,green,black,black,black&size=12,18`;
+  return `${URL}/imgen?text=${myStringEncoded}&color=black,green,black,black,red,black,black,black,black&size=12,18,12,12,12`;
 }
 
 const _html = (img, msg, action, url) => `
@@ -36,11 +36,13 @@ const _html = (img, msg, action, url) => `
     <meta property="fc:frame:button:1" content="${msg}" />
     <meta property="fc:frame:button:1:action" content="${action}" />
     <meta property="fc:frame:button:1:target" content="${url}" />
+    <meta property="fc:frame:button:2" content="🏆 Go to Learderboard" />
+    <meta property="fc:frame:button:2:action" content="link" />
+    <meta property="fc:frame:button:2:target" content="https://sf-frame-3.vercel.app/leaderboard" />
     <meta property="fc:frame:post_url" content="${url}" />
   </head>
 </html>
 `;
-
 export async function POST(req) {
   const data = await req.json();
 
@@ -65,14 +67,18 @@ export async function POST(req) {
       _html(getImgUrl(notFollowingString), "Retry", "post", `${URL}`)
     );
   }
-  const fetchData = await fetch(`${URL}/currentYoinkerApi`);
-  const fetchDataJson=await fetchData.json();
-  const currentYoinker=fetchDataJson.profileHandle;
+  
+  const fetchDataTotalStreams = await fetch(`${URL}/totalYoinked`);
+  const fetchDataTotalStreamsJson=await fetchDataTotalStreams.json();
+  const totalStreams=fetchDataTotalStreamsJson.totalScore;
+  const fetchDataCurrentYoinker = await fetch(`${URL}/currentYoinkerApi`);
+  const fetchDataCurrentYoinkerJson=await fetchDataCurrentYoinker.json();
+  const currentYoinker=fetchDataCurrentYoinkerJson.profileHandle;
 
   return new NextResponse(
     _html(
-      getImgUrl(welcomeString(currentYoinker)),
-      "Yoink",
+      getImgUrl(welcomeString(currentYoinker,totalStreams)),
+      "🔻 Yoink",
       "post",
       `${URL}/check`
     )

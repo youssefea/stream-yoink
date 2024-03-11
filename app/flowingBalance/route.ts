@@ -1,5 +1,8 @@
-// app/api/image/route.ts
-import { NextRequest, NextResponse } from 'next/server';
+// pages/api/balance.ts
+'use server';
+import { unstable_noStore as noStore } from 'next/cache';
+import type { NextRequest } from 'next/server';
+import { NextResponse } from 'next/server';
 
 
 const superfluidLogo = `<path fill-rule="evenodd" clip-rule="evenodd" d="M62.415 22.0661V14.4242H66.1397V22.37C66.1397 23.1611 66.3831 23.7953 66.8703 24.2736C67.3578 24.7517 67.9786 24.9911 68.7328 24.9911C69.4681 24.9911 70.0753 24.7469 70.5536 24.2597C71.0317 23.7725 71.2708 23.1422 71.2708 22.37V14.4242H74.9953V22.0661C74.9953 23.9422 74.4019 25.4692 73.2158 26.6458C72.0294 27.8233 70.5353 28.4117 68.7328 28.4117C66.8933 28.4117 65.3811 27.8278 64.1947 26.6594C63.0081 25.4917 62.415 23.9608 62.415 22.0661Z" fill="#12141E"/>
@@ -16,64 +19,64 @@ const superfluidLogo = `<path fill-rule="evenodd" clip-rule="evenodd" d="M62.415
 <path fill-rule="evenodd" clip-rule="evenodd" d="M30.6978 23.5061H23.4586V16.2669H16.2192V9.0275H30.6978V23.5061ZM8.98 30.7453H16.2192V23.5061H8.98V30.7453ZM0 4.38417V35.3892C0 37.7839 1.94139 39.7256 4.33639 39.7256H35.3414C37.7364 39.7256 39.6778 37.7839 39.6778 35.3892V4.38417C39.6778 1.98917 37.7364 0.0477791 35.3414 0.0477791H4.33639C1.94139 0.0477791 0 1.98917 0 4.38417Z" fill="#12141E"/>
 `;
 
-// Helper function to create an SVG with text
-function generateSVG(text: string, color: string[], backgroundColor: string, size: string[]) {
-    // Split text into lines
-    const lines = text.split('_'); // Assuming you use \n to indicate new lines in your text input
-    const lineHeight = 18; // Adjust line height as needed
-    const startingY = 20; // Adjust starting Y position based on number of lines to keep it centered
-  
-    // Lines of text SVG
-    const textSVG = lines.map((line, index) => `
-      <text 
-        x="50%" 
-        y="${startingY + index * lineHeight}" 
-        dominant-baseline="middle" 
-        text-anchor="middle" 
-        font-family="Helvetica" 
-        font-size="${size[index] || 10}" 
-        fill="${color[index]}"
-      >
-        ${line}
-      </text>
-    `).join('');
 
-    
-  
-    // SVG template with text and simple styling, including logo transformation
+function generateSVG(userName: string, initialBalance: number) {
+    const increments = 1000; // Define the number of increments shown.
+    const stepValue = 0.0001;
+    const duration = 0.1; // Half-second increments
+    const fontSize = 12; // Font size for the balance
+
+    let texts = '';
+    for (let i = 0; i < increments; i++) {
+        const balance = initialBalance + stepValue * i;
+        const balanceStr = balance.toFixed(4); // Keep 7 decimal places
+        texts += `
+            <text x="50%" y="70%" fill="orange" font-size="${fontSize}px" font-family="Arial" text-anchor="middle" visibility="hidden">
+                ${balanceStr}
+                <set attributeName="visibility" to="visible" begin="${i * duration}s" dur="${duration}s" repeatCount="indefinite"/>
+                <set attributeName="visibility" to="hidden" begin="${(i + 1) * duration}s" dur="${duration}s" repeatCount="indefinite"/>
+            </text>
+        `;
+    }
+
     return `
-      <svg width="200" height="200" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
-        <rect width="100%" height="100%" fill="${backgroundColor}" />
-        ${textSVG}
-        <g transform="translate(50, 150) scale(0.5)">
-          ${superfluidLogo}
-        </g>
-      </svg>
+        <svg width="200" height="200" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+            <rect width="100%" height="100%" fill="white"/>
+            <text x="50%" y="30" fill="black" font-size="12px" font-family="Arial" text-anchor="middle">
+                Congrats
+            </text>
+            <text x="50%" y="55" fill="green" font-size="18px" font-family="Arial" text-anchor="middle">
+                ${userName}
+            </text>
+            <text x="50%" y="80" fill="black" font-size="12px" font-family="Arial" text-anchor="middle">
+                You got the stream.
+            </text>
+            <text x="50%" y="120" fill="black" font-size="12px" font-family="Arial" text-anchor="middle">
+                Watch your balance dance !
+            </text>
+            ${texts}
+        </svg>
     `;
-  }
-
-export async function GET(request: NextRequest) {
-
-  const { searchParams } = request.nextUrl;
-  const text = searchParams.get('text') || 'Default Text';
-  const color = searchParams.get('color')?.split(",") || new Array(10).fill('black');
-  const size = request.nextUrl.searchParams.get('size')?.split(",") || new Array(10).fill('12');
-  const backgroundColor = searchParams.get('background') || 'white';
-
-  // Validate inputs as needed
-  if (!text) {
-    return new NextResponse('Query parameter "text" is required', { status: 400 });
-  }
-
-  const svg = generateSVG(text, color, backgroundColor, size);
-  return new NextResponse(svg, {
-    status: 200,
-    headers: {
-      'Content-Type': 'image/svg+xml',
-      'Cache-Control': 's-maxage=1, stale-while-revalidate',
-    },
-  });
 }
 
-// Force the function to be considered dynamic to bypass any caching
-export const dynamic = 'force-dynamic';
+export async function GET(request: NextRequest) {
+    noStore();
+
+    const searchParams = new URL(request.url).searchParams;
+    const userName = searchParams.get('user') || 'User';
+    const initialBalanceParam = searchParams.get('balance');
+    const initialBalance = parseFloat(initialBalanceParam || '0.0000001');
+
+    if (isNaN(initialBalance)) {
+        return new NextResponse('Invalid initial balance', { status: 400 });
+    }
+
+    const svgContent = generateSVG(userName, initialBalance);
+    return new NextResponse(svgContent, {
+        status: 200,
+        headers: {
+            'Content-Type': 'image/svg+xml',
+            'Cache-Control': 's-maxage=1, stale-while-revalidate',
+        },
+    });
+}
