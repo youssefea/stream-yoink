@@ -3,9 +3,8 @@ import { URL } from '../constants'
 
 
 const myString = `
-Welcome to\n Yoink Streams by Superfluid\n
-The stream follows the last Yoinker\n
-Start Yoinking below ↓
+StreamYoink!\n
+Click below to start your stream ↓
 `;
 const myStringEncoded = encodeURIComponent(myString);
 const image = `${URL}/imgen?text=${myStringEncoded}`;

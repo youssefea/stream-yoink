@@ -1,6 +1,12 @@
 import { NextResponse } from "next/server";
-import { followingQuery, walletQuery, lastYoinkedQuery, fetchSubgraphData } from "../api";
+import {
+  followingQuery,
+  walletQuery,
+  lastYoinkedQuery,
+  fetchSubgraphData,
+} from "../api";
 import { init, fetchQuery } from "@airstack/node";
+import { kv } from "@vercel/kv";
 
 const URL =
   process.env.ENVIRONMENT === "local"
@@ -9,14 +15,13 @@ const URL =
 
 init(process.env.AIRSTACK_KEY || "");
 
-
 const notFollowingString = `
-You are not following us !\n
-Follow to get your Yoinked Stream
+Follow @superfluid !\n
+to yoink the stream
 `;
 
-const welcomeString = `
-You are a Superfluid Follower !\n
+const welcomeString = (yoinker) => `
+${yoinker} has the stream !\n
 You can Yoink your Stream below
 `;
 
@@ -66,10 +71,10 @@ export async function POST(req) {
       _html(getImgUrl(notFollowingString), "Retry", "post", `${URL}`)
     );
   }
-
+  const currentYoinker = await kv.hget("currentYoinker", "profileHandle");
   return new NextResponse(
     _html(
-      getImgUrl(welcomeString),
+      getImgUrl(welcomeString(currentYoinker)),
       "Yoink",
       "post",
       `${URL}/check`

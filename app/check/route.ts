@@ -8,6 +8,7 @@ import {
 import { init, fetchQuery } from "@airstack/node";
 import { account, walletClient, publicClient } from "./config";
 import ABI from "./abi.json";
+import {kv} from "@vercel/kv";
 
 const URL =
   process.env.ENVIRONMENT === "local"
@@ -104,7 +105,10 @@ export async function POST(req) {
       : result3.data.account.outflows[0].updatedAtTimestamp;
   const now = Math.round(Date.now()/1000);
 
-  if (Number(lastYoink)+7200000 > now) {
+  console.log(Number(lastYoink)+7200000)
+  console.log(now)
+
+  if (Number(lastYoink)+7200 > now) {
     return new NextResponse(
       _html(getImgUrl(reyoinkedString), "Retry", "post", `${URL}`)
     );
@@ -116,7 +120,6 @@ export async function POST(req) {
     functionName: "getFlowrate",
     args: [USDCxAddress, account.address, address],
   });
-
 
   if (Number(receiverCurrentFlowRate) > 0) {
     const { request: deleteStream } = await publicClient.simulateContract({
@@ -139,10 +142,11 @@ export async function POST(req) {
   });
   await walletClient.writeContract(startStream);
 
-
-
   const userHandle =
   results.Wallet.socialFollowers.Follower[0].followerAddress.socials[0].profileHandle;
+
+  await kv.hset('currentYoinker', { profileHandle: userHandle, address: address});
+  await kv.zincrby('yoinkedStreams', 1, userHandle);
 
   return new NextResponse(
     _html(
