@@ -20,7 +20,7 @@ const superfluidLogo = `<path fill-rule="evenodd" clip-rule="evenodd" d="M62.415
 `;
 
 
-function generateSVG(userName: string, initialBalance: number) {
+function generateSVG(userName: string, initialBalance: number, already:string) {
     const increments = 1000; // Define the number of increments shown.
     const stepValue = 0.0001;
     const duration = 0.1; // Half-second increments
@@ -38,6 +38,7 @@ function generateSVG(userName: string, initialBalance: number) {
             </text>
         `;
     }
+    const alreadyTxt = already == "yes" ? `You already got it. Stop Yoinking :)` : "You got the Stream";
 
     return `
         <svg width="200" height="200" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
@@ -49,7 +50,7 @@ function generateSVG(userName: string, initialBalance: number) {
                 ${userName}
             </text>
             <text x="50%" y="80" fill="black" font-size="12px" font-family="Arial" text-anchor="middle">
-                You got the stream.
+                ${alreadyTxt}
             </text>
             <text x="50%" y="120" fill="black" font-size="12px" font-family="Arial" text-anchor="middle">
                 Watch your balance dance !
@@ -66,12 +67,13 @@ export async function GET(request: NextRequest) {
     const userName = searchParams.get('user') || 'User';
     const initialBalanceParam = searchParams.get('balance');
     const initialBalance = parseFloat(initialBalanceParam || '0.0000001');
+    const already = searchParams.get('already') || "no";
 
     if (isNaN(initialBalance)) {
         return new NextResponse('Invalid initial balance', { status: 400 });
     }
 
-    const svgContent = generateSVG(userName, initialBalance);
+    const svgContent = generateSVG(userName, initialBalance, already);
     return new NextResponse(svgContent, {
         status: 200,
         headers: {

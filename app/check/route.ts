@@ -9,8 +9,8 @@ import {
 import { init, fetchQuery } from "@airstack/node";
 import { account, walletClient, publicClient } from "./config";
 import ABI from "./abi.json";
-import { kv } from "@vercel/kv";
-import { assert } from "console";
+import ERC20ABI from "./erc20abi.json";
+import { formatEther } from "viem";
 
 const URL =
   process.env.ENVIRONMENT === "local"
@@ -95,7 +95,7 @@ export async function POST(req) {
       ? 0
       : result3.data.account.outflows[0].updatedAtTimestamp;
   const now = Math.round(Date.now() / 1000);
-
+  console.log(Number(lastYoink)+7200,"now", now);
   if (Number(lastYoink)+7200 > now) {
     return new NextResponse(
       _html(getImgUrl(reyoinkedString(userHandle)), "Retry 🔁", "post", `${URL}`)
@@ -105,7 +105,14 @@ export async function POST(req) {
   const fetchData = await fetch(`${URL}/currentYoinkerApi`);
   const fetchDataJson = await fetchData.json();
   const currentYoinkerAddress = fetchDataJson.address;
-  console.log(currentYoinkerAddress);
+
+
+  const receiverCurrentBalance : any = await publicClient.readContract({
+    address: USDCxAddress,
+    abi: ERC20ABI,
+    functionName: "balanceOf",
+    args: [newAddress],
+  });
 
   if (currentYoinkerAddress != newAddress) {
     if (currentYoinkerAddress != null) {
@@ -139,12 +146,22 @@ export async function POST(req) {
     });
     await walletClient.writeContract(startStream);
   }
+  else if (currentYoinkerAddress == newAddress){
+    return new NextResponse(
+      _html(
+        `${URL}/flowingBalance?user=${userHandle}&balance=${formatEther(receiverCurrentBalance).toString()}&already=yes`,
+        "See in Dashboard 🌊",
+        "link",
+        `https://app.superfluid.finance/?view=${newAddress}`
+      )
+    );
+  }    
 
   await updateProfileData(userHandle, newAddress);
 
   return new NextResponse(
     _html(
-      `${URL}/flowingBalance?user=${userHandle}&balance=0.0001`,
+      `${URL}/flowingBalance?user=${userHandle}&balance=${formatEther(receiverCurrentBalance).toString()}`,
       "See in Dashboard 🌊",
       "link",
       `https://app.superfluid.finance/?view=${newAddress}`
