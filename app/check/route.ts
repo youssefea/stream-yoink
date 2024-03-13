@@ -114,7 +114,7 @@ export async function POST(req) {
     args: [newAddress],
   });
 
-  if (currentYoinkerAddress != newAddress) {
+  if (currentYoinkerAddress.toLowerCase() != newAddress.toLowerCase()) {
     if (currentYoinkerAddress != null) {
       const receiverCurrentFlowRate = await publicClient.readContract({
         address: contractAddress,
@@ -146,7 +146,7 @@ export async function POST(req) {
     });
     await walletClient.writeContract(startStream);
   }
-  else if (currentYoinkerAddress == newAddress){
+  else if (currentYoinkerAddress.toLowerCase() == newAddress.toLowerCase()){
     return new NextResponse(
       _html(
         `${URL}/flowingBalance?user=${userHandle}&balance=${formatEther(receiverCurrentBalance).toString()}&already=yes`,
