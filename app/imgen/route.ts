@@ -24,28 +24,31 @@ function generateSVG(text: string, color: string[], backgroundColor: string, siz
     const startingY = 20; // Adjust starting Y position based on number of lines to keep it centered
   
     // Lines of text SVG
-    const textSVG = lines.map((line, index) => `
+    const textSVG = lines.map((line, index) => {
+      const fillColor = color[index] === "superfluid" ? "#1DB227" : color[index];
+      return `
       <text 
-        x="50%" 
-        y="${startingY + index * lineHeight}" 
-        dominant-baseline="middle" 
-        text-anchor="middle" 
-        font-family="Helvetica" 
-        font-size="${size[index] || 10}" 
-        fill="${color[index]}"
+          x="50%" 
+          y="${startingY + index * lineHeight}" 
+          dominant-baseline="middle" 
+          text-anchor="middle" 
+          font-family="Helvetica" 
+          font-size="${size[index] || 10}" 
+          fill="${fillColor}"
       >
-        ${line}
+          ${line}
       </text>
-    `).join('');
+      `;
+  }).join('');
 
     
   
     // SVG template with text and simple styling, including logo transformation
     return `
-      <svg width="200" height="200" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+      <svg width="200" height="150" viewBox="0 0 200 150" xmlns="http://www.w3.org/2000/svg">
         <rect width="100%" height="100%" fill="${backgroundColor}" />
         ${textSVG}
-        <g transform="translate(50, 150) scale(0.5)">
+        <g transform="translate(75, 120) scale(0.35)">
           ${superfluidLogo}
         </g>
       </svg>

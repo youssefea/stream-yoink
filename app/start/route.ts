@@ -7,6 +7,9 @@ import {
 } from "../api";
 import { init, fetchQuery } from "@airstack/node";
 import { kv } from "@vercel/kv";
+import { account, walletClient, publicClient } from "./config";
+import ERC20ABI from "./erc20abi.json";
+import { formatEther } from "viem";
 
 const URL =
   process.env.ENVIRONMENT === "local"
@@ -15,13 +18,15 @@ const URL =
 
 init(process.env.AIRSTACK_KEY || "");
 
+const USDCxAddress = process.env.SUPER_TOKEN_ADDRESS as `0x${string}`;
+
 const notFollowingString = `_@superfluid__Follow us__and start Yoinking!`;
 
-const welcomeString = (yoinker, totalYoinked) => `_${yoinker}_has the stream !_The stream has been Yoinked_${totalYoinked} times__You can Yoink your Stream below ↓`;
+const welcomeString = (yoinker, totalStreamed) => `_${yoinker}_has the stream ! 🌊__${totalStreamed} $DEGEN_has been streamed`;
 
 function getImgUrl(myString: string) {
   const myStringEncoded = encodeURIComponent(myString);
-  return `${URL}/imgen?text=${myStringEncoded}&color=black,green,black,black,red,black,black,black,black&size=12,18,12,12,12`;
+  return `${URL}/imgen?text=${myStringEncoded}&color=black,superfluid,black,black,black,black,black,black&size=10,24,10,10,10`;
 }
 
 const _html = (img, msg, action, url) => `
@@ -75,10 +80,20 @@ export async function POST(req) {
   const fetchDataCurrentYoinkerJson=await fetchDataCurrentYoinker.json();
   const currentYoinker=fetchDataCurrentYoinkerJson.profileHandle;
 
+  const balanceOfAccount : any = await publicClient.readContract({
+    address: USDCxAddress,
+    abi: ERC20ABI,
+    functionName: "balanceOf",
+    args: [account.address],
+  });
+
+  const totalStreamed=100000-Number(formatEther(balanceOfAccount));
+
+
   return new NextResponse(
     _html(
-      getImgUrl(welcomeString(currentYoinker,totalStreams)),
-      "🔻 Yoink",
+      getImgUrl(welcomeString(currentYoinker,totalStreamed.toFixed(0))),
+      "🌊 Yoink",
       "post",
       `${URL}/check`
     )

@@ -21,9 +21,9 @@ const superfluidLogo = `<path fill-rule="evenodd" clip-rule="evenodd" d="M62.415
 
 
 function generateSVG(userName: string, initialBalance: number, already:string) {
-    const increments = 1000; // Define the number of increments shown.
-    const stepValue = 0.0001;
-    const duration = 0.1; // Half-second increments
+    const increments = 10000; // Define the number of increments shown.
+    const stepValue = 0.0016;
+    const duration = 0.05; 
     const fontSize = 12; // Font size for the balance
 
     let texts = '';
@@ -31,29 +31,27 @@ function generateSVG(userName: string, initialBalance: number, already:string) {
         const balance = initialBalance + stepValue * i;
         const balanceStr = balance.toFixed(4); // Keep 7 decimal places
         texts += `
-            <text x="50%" y="70%" fill="orange" font-size="${fontSize}px" font-family="Arial" text-anchor="middle" visibility="hidden">
+            <text x="50%" y="70%" fill="black" font-size="${fontSize}px" font-family="Arial" text-anchor="middle" visibility="hidden">
                 ${balanceStr}
                 <set attributeName="visibility" to="visible" begin="${i * duration}s" dur="${duration}s" repeatCount="indefinite"/>
                 <set attributeName="visibility" to="hidden" begin="${(i + 1) * duration}s" dur="${duration}s" repeatCount="indefinite"/>
+                🎩 $DEGEN
             </text>
         `;
     }
-    const alreadyTxt = already == "yes" ? `You already got it. Stop Yoinking :)` : "You got the Stream";
+    const alreadyTxt = already == "yes" ? `You already had the stream 🌊` : "You have the stream 🌊";
 
     return `
-        <svg width="200" height="200" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+        <svg width="200" height="150" viewBox="0 0 200 150" xmlns="http://www.w3.org/2000/svg">
             <rect width="100%" height="100%" fill="white"/>
-            <text x="50%" y="30" fill="black" font-size="12px" font-family="Arial" text-anchor="middle">
-                Congrats
-            </text>
-            <text x="50%" y="55" fill="green" font-size="18px" font-family="Arial" text-anchor="middle">
+            <text x="50%" y="40" fill="#1DB227" font-size="24px" font-family="Arial" text-anchor="middle">
                 ${userName}
             </text>
-            <text x="50%" y="80" fill="black" font-size="12px" font-family="Arial" text-anchor="middle">
+            <text x="50%" y="60" fill="black" font-size="10px" font-family="Arial" text-anchor="middle">
                 ${alreadyTxt}
             </text>
-            <text x="50%" y="120" fill="black" font-size="12px" font-family="Arial" text-anchor="middle">
-                Watch your balance dance !
+            <text x="50%" y="80" fill="black" font-size="10px" font-family="Arial" text-anchor="middle">
+                Your balance:
             </text>
             ${texts}
         </svg>

@@ -19,23 +19,18 @@ const URL =
 
 // USDC contract address on Base
 const contractAddress = "0xcfA132E353cB4E398080B9700609bb008eceB125";
-const USDCxAddress = "0xD6FAF98BeFA647403cc56bDB598690660D5257d2";
+const USDCxAddress = process.env.SUPER_TOKEN_ADDRESS as `0x${string}`;
 
 init(process.env.AIRSTACK_KEY || "");
 
-const noConnectedString = `_StreamYoink__You don't have a connected wallet !__Connect a wallet to your farcaster account`;
-
-const notFollowingString = `_@superfluid__Follow us__and start Yoinking!`;
+const noConnectedString = `_StreamYoink!__You don't have a connected wallet !__Connect a wallet to your farcaster account`;
 
 const reyoinkedString = (userHandle) =>
-  `_${userHandle}__You have to wait 2 hours__to be able to yoink again !`;
-
-const congratsString = (userHandle) =>
-  `_${userHandle}_Congrats!_you hold the yoink stream !`;
+  `_Slow Down !_You are Yoinking too fast_You can Yoink the Stream_once every 30 mins !`;
 
 function getImgUrl(myString: string) {
   const myStringEncoded = encodeURIComponent(myString);
-  return `${URL}/imgen?text=${myStringEncoded}&color=black,green,black,black,black&size=12,18`;
+  return `${URL}/imgen?text=${myStringEncoded}&color=black,superfluid,black,black,black&size=10,24,10,10,10,10`;
 }
 
 const flowRate = 380517503805;
@@ -94,20 +89,14 @@ export async function POST(req) {
     result3.data.account.outflows[0] == null
       ? 0
       : result3.data.account.outflows[0].updatedAtTimestamp;
-  const now = Math.round(Date.now() / 1000);
-  console.log(Number(lastYoink)+7200,"now", now);
-  if (Number(lastYoink)+7200 > now) {
-    return new NextResponse(
-      _html(getImgUrl(reyoinkedString(userHandle)), "Retry 🔁", "post", `${URL}`)
-    );
-  }
+  const now = Math.floor(Date.now() / 1000);
+  console.log(Number(lastYoink) + 7200, "now", now);
 
   const fetchData = await fetch(`${URL}/currentYoinkerApi`);
   const fetchDataJson = await fetchData.json();
   const currentYoinkerAddress = fetchDataJson.address;
 
-
-  const receiverCurrentBalance : any = await publicClient.readContract({
+  const receiverCurrentBalance: any = await publicClient.readContract({
     address: USDCxAddress,
     abi: ERC20ABI,
     functionName: "balanceOf",
@@ -115,6 +104,17 @@ export async function POST(req) {
   });
 
   if (currentYoinkerAddress.toLowerCase() != newAddress.toLowerCase()) {
+    if (Number(lastYoink) + 7200 > now) {
+      return new NextResponse(
+        _html(
+          getImgUrl(reyoinkedString(userHandle)),
+          "Retry 🔁",
+          "post",
+          `${URL}`
+        )
+      );
+    }
+
     if (currentYoinkerAddress != null) {
       const receiverCurrentFlowRate = await publicClient.readContract({
         address: contractAddress,
@@ -145,23 +145,26 @@ export async function POST(req) {
       args: [USDCxAddress, newAddress, flowRate],
     });
     await walletClient.writeContract(startStream);
-  }
-  else if (currentYoinkerAddress.toLowerCase() == newAddress.toLowerCase()){
+  } else if (currentYoinkerAddress.toLowerCase() == newAddress.toLowerCase()) {
     return new NextResponse(
       _html(
-        `${URL}/flowingBalance?user=${userHandle}&balance=${formatEther(receiverCurrentBalance).toString()}&already=yes`,
+        `${URL}/flowingBalance?user=${userHandle}&balance=${formatEther(
+          receiverCurrentBalance
+        ).toString()}&already=yes`,
         "See in Dashboard 🌊",
         "link",
         `https://app.superfluid.finance/?view=${newAddress}`
       )
     );
-  }    
+  }
 
   await updateProfileData(userHandle, newAddress);
 
   return new NextResponse(
     _html(
-      `${URL}/flowingBalance?user=${userHandle}&balance=${formatEther(receiverCurrentBalance).toString()}`,
+      `${URL}/flowingBalance?user=${userHandle}&balance=${formatEther(
+        receiverCurrentBalance
+      ).toString()}`,
       "See in Dashboard 🌊",
       "link",
       `https://app.superfluid.finance/?view=${newAddress}`

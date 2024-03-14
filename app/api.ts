@@ -45,6 +45,8 @@ query GetLastYoinked {
   account(id: "${account.address.toLowerCase()}") {
     outflows(
       where: {receiver: "${receiverAddress.toLowerCase()}", token_contains_nocase: "0xD6FAF98BeFA647403cc56bDB598690660D5257d2"}
+      orderBy: updatedAtTimestamp
+      orderDirection: desc
     ) {
       updatedAtTimestamp
       token {
