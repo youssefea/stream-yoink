@@ -47,7 +47,7 @@ const _html = (img, msg, action, url) => `
     <meta property="fc:frame:button:1" content="${msg}" />
     <meta property="fc:frame:button:1:action" content="${action}" />
     <meta property="fc:frame:button:1:target" content="${url}" />
-    <meta property="fc:frame:button:2" content="🏆 Go to Learderboard" />
+    <meta property="fc:frame:button:2" content="🏆 Go to Leaderboard" />
     <meta property="fc:frame:button:2:action" content="link" />
     <meta property="fc:frame:button:2:target" content="https://sf-frame-3.vercel.app/leaderboard" />
     <meta property="fc:frame:post_url" content="${url}" />
@@ -114,6 +114,9 @@ export async function POST(req) {
         )
       );
     }
+    let nonce = await publicClient.getTransactionCount({  
+      address: account.address,
+    })
 
     if (currentYoinkerAddress != null) {
       const receiverCurrentFlowRate = await publicClient.readContract({
@@ -124,27 +127,27 @@ export async function POST(req) {
       });
 
       if (Number(receiverCurrentFlowRate) > 0) {
-        const { request: deleteStream } = await publicClient.simulateContract({
+        await walletClient.writeContract({
           address: contractAddress,
           abi: ABI,
           functionName: "deleteFlow",
           account,
+          nonce: nonce,
           args: [USDCxAddress, account.address, currentYoinkerAddress, "0x0"],
         });
-        await walletClient.writeContract(deleteStream);
+        nonce++;
+        //await walletClient.writeContract(deleteStream);
       }
     }
-
-    const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
-    await sleep(200);
-    const { request: startStream } = await publicClient.simulateContract({
+    await walletClient.writeContract({
       address: contractAddress,
       abi: ABI,
       functionName: "setFlowrate",
       account,
+      nonce: nonce,
       args: [USDCxAddress, newAddress, flowRate],
     });
-    await walletClient.writeContract(startStream);
+    //await walletClient.writeContract(startStream);
   } else if (currentYoinkerAddress.toLowerCase() == newAddress.toLowerCase()) {
     return new NextResponse(
       _html(
