@@ -19,7 +19,7 @@ const superfluidLogo = `<path fill-rule="evenodd" clip-rule="evenodd" d="M62.415
 // Helper function to create an SVG with text
 function generateSVG(text: string, color: string[], backgroundColor: string, size: string[]) {
     // Split text into lines
-    const lines = text.split('_'); // Assuming you use \n to indicate new lines in your text input
+    const lines = text.split('_'); // Assuming you use _ to indicate new lines in your text input
     const lineHeight = 18; // Adjust line height as needed
     const startingY = 20; // Adjust starting Y position based on number of lines to keep it centered
   
