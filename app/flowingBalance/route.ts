@@ -54,6 +54,7 @@ function generateSVG(userName: string, initialBalance: number, already:string) {
                 Your balance:
             </text>
             ${texts}
+            
         </svg>
     `;
 }
