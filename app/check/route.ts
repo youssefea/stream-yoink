@@ -23,14 +23,14 @@ const USDCxAddress = process.env.SUPER_TOKEN_ADDRESS as `0x${string}`;
 
 init(process.env.AIRSTACK_KEY || "");
 
-const noConnectedString = `_StreamYoink!__You don't have a connected wallet !__Connect a wallet to your farcaster account`;
+const noConnectedString = `_StreamYoink!_You don't have a connected wallet !_Connect a wallet to your Farcaster account`;
 
 const reyoinkedString = (userHandle) =>
-  `_Slow Down !_You are Yoinking too fast_You can Yoink the Stream_once every 30 mins !`;
+  `_Slow Down !_You are Yoinking too fast_You can Yoink the Stream once every 5 mins !`;
 
 function getImgUrl(myString: string) {
   const myStringEncoded = encodeURIComponent(myString);
-  return `${URL}/imgen?text=${myStringEncoded}&color=black,superfluid,black,black,black&size=10,24,10,10,10,10`;
+  return `${URL}/imgen?text=${myStringEncoded}&color=black,superfluid,black,black,black&size=10,24,8,8,8,8,8,8,8`;
 }
 
 const flowRate = 380517503805;
@@ -126,7 +126,7 @@ export async function POST(req) {
   });
 
   if (currentYoinkerAddress.toLowerCase() != newAddress.toLowerCase()) {
-    if (Number(lastYoink) + 10 > now) {
+    if (Number(lastYoink) + 100000 > now) {
       return new NextResponse(
         _html(
           getImgUrl(reyoinkedString(userHandle)),

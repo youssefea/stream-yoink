@@ -45,10 +45,10 @@ function generateSVG(text: string, color: string[], backgroundColor: string, siz
   
     // SVG template with text and simple styling, including logo transformation
     return `
-      <svg width="200" height="150" viewBox="0 0 200 150" xmlns="http://www.w3.org/2000/svg">
+      <svg width="191" height="100" viewBox="0 0 191 100" xmlns="http://www.w3.org/2000/svg">
         <rect width="100%" height="100%" fill="${backgroundColor}" />
         ${textSVG}
-        <g transform="translate(75, 120) scale(0.35)">
+        <g transform="translate(70, 85) scale(0.35)">
           ${superfluidLogo}
         </g>
       </svg>
