@@ -126,7 +126,7 @@ export async function POST(req) {
   });
 
   if (currentYoinkerAddress.toLowerCase() != newAddress.toLowerCase()) {
-    if (Number(lastYoink) + 100000 > now) {
+    if (Number(lastYoink) + 10 > now) {
       return new NextResponse(
         _html(
           getImgUrl(reyoinkedString(userHandle)),
