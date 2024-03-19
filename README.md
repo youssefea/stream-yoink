@@ -22,7 +22,7 @@ To get started with StreamYoink!, follow these simple steps:
 
    ```bash
    git clone https://github.com/youssefea/stream-yoink.git
-```
+    ```
 
 2. Navigate to the game's directory:
     
