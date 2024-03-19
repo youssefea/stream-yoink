@@ -55,6 +55,28 @@ const _html = (img, msg, action, url) => `
 </html>
 `;
 
+async function deleteFlow(_from, _to, _nonce){
+  await walletClient.writeContract({
+    address: contractAddress,
+    abi: ABI,
+    functionName: "deleteFlow",
+    account,
+    nonce: _nonce,
+    args: [USDCxAddress, _from, _to, "0x0"],
+  });
+}
+
+async function setFlowrate(_to, _nonce){
+  await walletClient.writeContract({
+    address: contractAddress,
+    abi: ABI,
+    functionName: "setFlowrate",
+    account,
+    nonce: _nonce,
+    args: [USDCxAddress, _to, flowRate],
+  });
+}
+
 export async function POST(req) {
   const data = await req.json();
 
@@ -127,26 +149,12 @@ export async function POST(req) {
       });
 
       if (Number(receiverCurrentFlowRate) > 0) {
-        await walletClient.writeContract({
-          address: contractAddress,
-          abi: ABI,
-          functionName: "deleteFlow",
-          account,
-          nonce: nonce,
-          args: [USDCxAddress, account.address, currentYoinkerAddress, "0x0"],
-        });
+        deleteFlow(account.address, currentYoinkerAddress, nonce);
         nonce++;
         //await walletClient.writeContract(deleteStream);
       }
     }
-    await walletClient.writeContract({
-      address: contractAddress,
-      abi: ABI,
-      functionName: "setFlowrate",
-      account,
-      nonce: nonce,
-      args: [USDCxAddress, newAddress, flowRate],
-    });
+    setFlowrate(newAddress, nonce);
     //await walletClient.writeContract(startStream);
   } else if (currentYoinkerAddress.toLowerCase() == newAddress.toLowerCase()) {
     return new NextResponse(
