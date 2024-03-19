@@ -172,6 +172,16 @@ export default function LeaderboardPage() {
       </table>
       <br />
       <div>
+      <p style={{ textAlign: "center", lineHeight: "1.5" }}>
+          <a
+            href="https://github.com/youssefea/stream-yoink"
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{ color: "#007bff", textDecoration: "none" }}
+          >
+            📖 Github Repo Link
+          </a>
+        </p>
         <p>
           Inspired by{" "}
           <a
@@ -191,13 +201,12 @@ export default function LeaderboardPage() {
           </a>
           ) and made by{" "}
           <a
-            href="https://github.com/youssea"
+            href="https://warpcast.com/youssea"
             target="_blank"
             rel="noopener noreferrer"
           >
             @youssea
           </a>
-          .
         </p>
       </div>
     </div>
