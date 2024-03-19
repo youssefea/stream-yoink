@@ -175,7 +175,7 @@ export default function LeaderboardPage() {
         <p>
           Inspired by{" "}
           <a
-            href="https://github.com/yoink"
+            href="https://warpcast.com/~/channel/yoink"
             target="_blank"
             rel="noopener noreferrer"
           >
@@ -183,7 +183,7 @@ export default function LeaderboardPage() {
           </a>{" "}
           (
           <a
-            href="https://github.com/yoink"
+            href="https://warpcast.com/horsefacts.eth"
             target="_blank"
             rel="noopener noreferrer"
           >
