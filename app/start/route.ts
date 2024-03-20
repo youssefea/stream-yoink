@@ -20,9 +20,9 @@ init(process.env.AIRSTACK_KEY || "");
 
 const USDCxAddress = process.env.SUPER_TOKEN_ADDRESS as `0x${string}`;
 
-const notFollowingString = `_@superfluid_Follow us to play StreamYoink!_and earn 🎩 $DEGEN every second`;
+const notFollowingString = `https://i.imgur.com/V2MXezK.png`;
 
-const welcomeString = (yoinker, totalLeft) => `_${yoinker}_has the stream ! 🌊_${totalLeft} 🎩 $DEGEN left in the pot`;
+const welcomeString = (yoinker, totalLeft) => `_${yoinker}_has the stream ! _${totalLeft} $DEGEN left in the pot`;
 
 function getImgUrl(myString: string) {
   const myStringEncoded = encodeURIComponent(myString);
@@ -69,7 +69,7 @@ export async function POST(req) {
 
   if (!results.Wallet.socialFollowers.Follower) {
     return new NextResponse(
-      _html(getImgUrl(notFollowingString), "Retry 🔁", "post", `${URL}`)
+      _html(getImgUrl(notFollowingString), "🎩 Retry", "post", `${URL}`)
     );
   }
   
@@ -93,7 +93,7 @@ export async function POST(req) {
   return new NextResponse(
     _html(
       getImgUrl(welcomeString(currentYoinker,totalLeft.toFixed(0))),
-      "🌊 Yoink",
+      "🎩 Yoink",
       "post",
       `${URL}/check`
     )

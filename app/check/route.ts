@@ -23,9 +23,9 @@ const USDCxAddress = process.env.SUPER_TOKEN_ADDRESS as `0x${string}`;
 
 init(process.env.AIRSTACK_KEY || "");
 
-const noConnectedString = `_StreamYoink!_You don't have a connected wallet !_Connect a wallet to your Farcaster account`;
+const noConnectedString = "https://i.imgur.com/GBYJbwP.png";
 
-const reyoinkedString =`_Slow Down !_You are Yoinking too fast_You can Yoink the Stream once a day !`;
+const reyoinkedString ="https://i.imgur.com/PQXIuuK.png";
 
 function getImgUrl(myString: string) {
   const myStringEncoded = encodeURIComponent(myString);
@@ -100,7 +100,7 @@ export async function POST(req) {
 
   if (!newAddress) {
     return new NextResponse(
-      _html(getImgUrl(noConnectedString), "Retry 🔁", "post", `${URL}`)
+      _html(getImgUrl(noConnectedString), "🎩 Retry", "post", `${URL}`)
     );
   }
 
@@ -128,7 +128,7 @@ export async function POST(req) {
       return new NextResponse(
         _html(
           getImgUrl(reyoinkedString),
-          "Retry 🔁",
+          "🎩 Retry",
           "post",
           `${URL}`
         )
