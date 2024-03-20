@@ -11,6 +11,12 @@ import { account, walletClient, publicClient } from "./config";
 import ERC20ABI from "./erc20abi.json";
 import { formatEther } from "viem";
 
+import {
+  checkIsFollowingFarcasterUser,
+  CheckIsFollowingFarcasterUserInput,
+  CheckIsFollowingFarcasterUserOutput,
+} from "@airstack/frames";
+
 const URL =
   process.env.ENVIRONMENT === "local"
     ? process.env.LOCALHOST
@@ -22,7 +28,8 @@ const USDCxAddress = process.env.SUPER_TOKEN_ADDRESS as `0x${string}`;
 
 const notFollowingString = `https://i.imgur.com/V2MXezK.png`;
 
-const welcomeString = (yoinker, totalLeft) => `_${yoinker}_has the stream ! _${totalLeft} $DEGEN left in the pot`;
+const welcomeString = (yoinker, totalLeft) =>
+  `_${yoinker}_has the stream ! _${totalLeft} $DEGEN left in the pot`;
 
 function getImgUrl(myString: string) {
   const myStringEncoded = encodeURIComponent(myString);
@@ -59,6 +66,15 @@ export async function POST(req) {
     id: fid,
   });
 
+  const input: CheckIsFollowingFarcasterUserInput = {
+    fid: fid,
+    isFollowing: [315653],
+  };
+  const { data: data1, error: error1 }: CheckIsFollowingFarcasterUserOutput =
+    await checkIsFollowingFarcasterUser(input);
+
+  console.log(data1);
+
   const _query2 = walletQuery(fid);
   const { data: results2 } = await fetchQuery(_query2, {
     id: fid,
@@ -67,32 +83,33 @@ export async function POST(req) {
   const socials = results2.Socials.Social;
   const newAddress = socials[0].userAssociatedAddresses[1];
 
-  if (!results.Wallet.socialFollowers.Follower) {
-    return new NextResponse(
-      _html(notFollowingString, "🎩 Retry", "post", `${URL}`)
-    );
+  if (data1 != null && data1[0].isFollowing != null) {
+    if (!data1[0].isFollowing) {
+      return new NextResponse(
+        _html(notFollowingString, "🎩 Retry", "post", `${URL}`)
+      );
+    }
   }
-  
-  const fetchDataTotalStreams = await fetch(`${URL}/totalYoinked`);
-  const fetchDataTotalStreamsJson=await fetchDataTotalStreams.json();
-  const totalStreams=fetchDataTotalStreamsJson.totalScore;
-  const fetchDataCurrentYoinker = await fetch(`${URL}/currentYoinkerApi`);
-  const fetchDataCurrentYoinkerJson=await fetchDataCurrentYoinker.json();
-  const currentYoinker=fetchDataCurrentYoinkerJson.profileHandle;
 
-  const balanceOfAccount : any = await publicClient.readContract({
+  const fetchDataTotalStreams = await fetch(`${URL}/totalYoinked`);
+  const fetchDataTotalStreamsJson = await fetchDataTotalStreams.json();
+  const totalStreams = fetchDataTotalStreamsJson.totalScore;
+  const fetchDataCurrentYoinker = await fetch(`${URL}/currentYoinkerApi`);
+  const fetchDataCurrentYoinkerJson = await fetchDataCurrentYoinker.json();
+  const currentYoinker = fetchDataCurrentYoinkerJson.profileHandle;
+
+  const balanceOfAccount: any = await publicClient.readContract({
     address: USDCxAddress,
     abi: ERC20ABI,
     functionName: "balanceOf",
     args: [account.address],
   });
 
-  const totalLeft=Number(formatEther(balanceOfAccount));
-
+  const totalLeft = Number(formatEther(balanceOfAccount));
 
   return new NextResponse(
     _html(
-      getImgUrl(welcomeString(currentYoinker,totalLeft.toFixed(0))),
+      getImgUrl(welcomeString(currentYoinker, totalLeft.toFixed(0))),
       "🎩 Yoink",
       "post",
       `${URL}/check`
