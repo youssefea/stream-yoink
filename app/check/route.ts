@@ -25,7 +25,7 @@ init(process.env.AIRSTACK_KEY || "");
 
 const noConnectedString = `_StreamYoink!_You don't have a connected wallet !_Connect a wallet to your Farcaster account`;
 
-const reyoinkedString =`_Slow Down !_You are Yoinking too fast_You can Yoink the Stream once every 5 mins !`;
+const reyoinkedString =`_Slow Down !_You are Yoinking too fast_You can Yoink the Stream once day !`;
 
 function getImgUrl(myString: string) {
   const myStringEncoded = encodeURIComponent(myString);
@@ -124,7 +124,7 @@ export async function POST(req) {
   });
 
   if (currentYoinkerAddress.toLowerCase() != newAddress.toLowerCase()) {
-    if (Number(lastYoink) + 300 > now) {
+    if (Number(lastYoink) + 86400 > now) {
       return new NextResponse(
         _html(
           getImgUrl(reyoinkedString),
