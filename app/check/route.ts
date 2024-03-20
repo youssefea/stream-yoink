@@ -18,7 +18,7 @@ const URL =
     ? process.env.LOCALHOST
     : process.env.PROD_URL;
 
-// USDC contract address on Base
+
 const contractAddress = "0xcfA132E353cB4E398080B9700609bb008eceB125";
 const USDCxAddress = process.env.SUPER_TOKEN_ADDRESS as `0x${string}`;
 
