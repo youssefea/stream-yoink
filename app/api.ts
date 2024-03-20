@@ -44,7 +44,7 @@ export const lastYoinkedQuery = (receiverAddress) => `
 query GetLastYoinked {
   account(id: "${account.address.toLowerCase()}") {
     outflows(
-      where: {receiver: "${receiverAddress.toLowerCase()}", token_contains_nocase: "0xD6FAF98BeFA647403cc56bDB598690660D5257d2"}
+      where: {receiver: "${receiverAddress.toLowerCase()}", token_contains_nocase: "0x1efF3Dd78F4A14aBfa9Fa66579bD3Ce9E1B30529"}
       orderBy: updatedAtTimestamp
       orderDirection: desc
     ) {

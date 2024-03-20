@@ -6,7 +6,7 @@ const myString = `_StreamYoink!_Click to yoink the stream 🌊_Earn 🎩$DEGEN e
 const myStringEncoded = encodeURIComponent(myString);
 const image = `${URL}/imgen?text=${myStringEncoded}&color=black,superfluid,black,black,black&size=10,24,8,8,8,8,8,8,8`;
 const buttonText1 = '🌊 Start Yoinking'
-const buttonText2 = '🏆 Go to Learderboard'
+const buttonText2 = '🏆 Go to Leaderboard'
 
 export default function Home() {
   return (
