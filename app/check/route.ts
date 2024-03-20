@@ -25,15 +25,14 @@ init(process.env.AIRSTACK_KEY || "");
 
 const noConnectedString = `_StreamYoink!_You don't have a connected wallet !_Connect a wallet to your Farcaster account`;
 
-const reyoinkedString = (userHandle) =>
-  `_Slow Down !_You are Yoinking too fast_You can Yoink the Stream once every 5 mins !`;
+const reyoinkedString =`_Slow Down !_You are Yoinking too fast_You can Yoink the Stream once every 5 mins !`;
 
 function getImgUrl(myString: string) {
   const myStringEncoded = encodeURIComponent(myString);
   return `${URL}/imgen?text=${myStringEncoded}&color=black,superfluid,black,black,black&size=10,24,8,8,8,8,8,8,8`;
 }
 
-const flowRate = 380517503805;
+const flowRate = 32724505000000000;
 
 const _html = (img, msg, action, url) => `
 <!DOCTYPE html>
@@ -49,7 +48,7 @@ const _html = (img, msg, action, url) => `
     <meta property="fc:frame:button:1:target" content="${url}" />
     <meta property="fc:frame:button:2" content="🏆 Go to Leaderboard" />
     <meta property="fc:frame:button:2:action" content="link" />
-    <meta property="fc:frame:button:2:target" content="https://sf-frame-3.vercel.app/leaderboard" />
+    <meta property="fc:frame:button:2:target" content="${URL}/leaderboard" />
     <meta property="fc:frame:post_url" content="${url}" />
   </head>
 </html>
@@ -112,7 +111,6 @@ export async function POST(req) {
       ? 0
       : result3.data.account.outflows[0].updatedAtTimestamp;
   const now = Math.floor(Date.now() / 1000);
-  console.log(Number(lastYoink) + 7200, "now", now);
 
   const fetchData = await fetch(`${URL}/currentYoinkerApi`);
   const fetchDataJson = await fetchData.json();
@@ -126,10 +124,10 @@ export async function POST(req) {
   });
 
   if (currentYoinkerAddress.toLowerCase() != newAddress.toLowerCase()) {
-    if (Number(lastYoink) + 10 > now) {
+    if (Number(lastYoink) + 300 > now) {
       return new NextResponse(
         _html(
-          getImgUrl(reyoinkedString(userHandle)),
+          getImgUrl(reyoinkedString),
           "Retry 🔁",
           "post",
           `${URL}`

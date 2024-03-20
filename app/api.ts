@@ -64,7 +64,7 @@ export async function fetchSubgraphData(myQuery) {
   };
 
   try {
-    const response = await fetch("https://optimism-sepolia.subgraph.x.superfluid.dev/", {
+    const response = await fetch("https://base-mainnet.subgraph.x.superfluid.dev/", {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
