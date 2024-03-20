@@ -100,7 +100,7 @@ export async function POST(req) {
 
   if (!newAddress) {
     return new NextResponse(
-      _html(getImgUrl(noConnectedString), "🎩 Retry", "post", `${URL}`)
+      _html(noConnectedString, "🎩 Retry", "post", `${URL}`)
     );
   }
 
@@ -116,18 +116,11 @@ export async function POST(req) {
   const fetchDataJson = await fetchData.json();
   const currentYoinkerAddress = fetchDataJson.address;
 
-  const receiverCurrentBalance: any = await publicClient.readContract({
-    address: USDCxAddress,
-    abi: ERC20ABI,
-    functionName: "balanceOf",
-    args: [newAddress],
-  });
-
   if (currentYoinkerAddress.toLowerCase() != newAddress.toLowerCase()) {
     if (Number(lastYoink) + 86400 > now) {
       return new NextResponse(
         _html(
-          getImgUrl(reyoinkedString),
+          reyoinkedString,
           "🎩 Retry",
           "post",
           `${URL}`
