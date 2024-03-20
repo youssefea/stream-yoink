@@ -35,7 +35,7 @@ export async function generateMetadata() {
     'fc:frame:post_url': `${URL}/start`,
     'fc:frame:button:2': buttonText2,
     'fc:frame:button:2:action': 'link',
-    'fc:frame:button:2:target': `https://sf-frame-3.vercel.app/leaderboard`,
+    'fc:frame:button:2:target': `${URL}/leaderboard`,
 
   }
 
