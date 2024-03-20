@@ -11,6 +11,7 @@ import { account, walletClient, publicClient } from "./config";
 import ABI from "./abi.json";
 import ERC20ABI from "./erc20abi.json";
 import { formatEther } from "viem";
+import { NeynarAPIClient, FeedType, FilterType } from "@neynar/nodejs-sdk";
 
 const URL =
   process.env.ENVIRONMENT === "local"
@@ -22,6 +23,7 @@ const contractAddress = "0xcfA132E353cB4E398080B9700609bb008eceB125";
 const USDCxAddress = process.env.SUPER_TOKEN_ADDRESS as `0x${string}`;
 
 init(process.env.AIRSTACK_KEY || "");
+const client = new NeynarAPIClient(process.env.NEYNAR_API_KEY as string);
 
 const noConnectedString = "https://i.imgur.com/GBYJbwP.png";
 
@@ -79,8 +81,12 @@ async function setFlowrate(_to, _nonce){
 export async function POST(req) {
   const data = await req.json();
 
-  const { untrustedData } = data;
+  const { untrustedData, trustedData } = data;
+  const { messageBytes }= trustedData;
   const { fid } = untrustedData;
+
+  const result = await client.validateFrameAction(messageBytes);
+  console.log(messageBytes);
 
   const _query = followingQuery(fid);
   const { data: results } = await fetchQuery(_query, {
