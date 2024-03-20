@@ -60,7 +60,7 @@ function generateSVG(
                 ${alreadyTxt}
             </text>
             <text x="50%" y="70" fill="black" font-size="8px" font-family="Arial" text-anchor="middle">
-                Your balance:
+                You earned this Yoink:
             </text>
             ${texts}
 
@@ -71,6 +71,7 @@ function generateSVG(
         </svg>
     `;
 }
+
 
 export async function GET(request: NextRequest) {
   noStore();

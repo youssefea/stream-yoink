@@ -157,9 +157,7 @@ export async function POST(req) {
   } else if (currentYoinkerAddress.toLowerCase() == newAddress.toLowerCase()) {
     return new NextResponse(
       _html(
-        `${URL}/flowingBalance?user=${userHandle}&balance=${formatEther(
-          receiverCurrentBalance
-        ).toString()}&already=yes`,
+        "https://i.imgur.com/NZRglCI.gif",
         "See in Dashboard 🌊",
         "link",
         `https://app.superfluid.finance/?view=${newAddress}`
@@ -171,9 +169,7 @@ export async function POST(req) {
 
   return new NextResponse(
     _html(
-      `${URL}/flowingBalance?user=${userHandle}&balance=${formatEther(
-        receiverCurrentBalance
-      ).toString()}`,
+      "https://i.imgur.com/NZRglCI.gif",
       "See in Dashboard 🌊",
       "link",
       `https://app.superfluid.finance/?view=${newAddress}`

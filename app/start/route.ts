@@ -20,9 +20,9 @@ init(process.env.AIRSTACK_KEY || "");
 
 const USDCxAddress = process.env.SUPER_TOKEN_ADDRESS as `0x${string}`;
 
-const notFollowingString = `_@superfluid_Follow us to play StreamYoink!_and earn 🎩$DEGEN every second`;
+const notFollowingString = `_@superfluid_Follow us to play StreamYoink!_and earn 🎩 $DEGEN every second`;
 
-const welcomeString = (yoinker, totalLeft) => `_${yoinker}_has the stream ! 🌊_${totalLeft} 🎩$DEGEN left in the pot`;
+const welcomeString = (yoinker, totalLeft) => `_${yoinker}_has the stream ! 🌊_${totalLeft} 🎩 $DEGEN left in the pot`;
 
 function getImgUrl(myString: string) {
   const myStringEncoded = encodeURIComponent(myString);
