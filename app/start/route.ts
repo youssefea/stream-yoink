@@ -69,7 +69,7 @@ export async function POST(req) {
 
   if (!results.Wallet.socialFollowers.Follower) {
     return new NextResponse(
-      _html(getImgUrl(notFollowingString), "🎩 Retry", "post", `${URL}`)
+      _html(notFollowingString, "🎩 Retry", "post", `${URL}`)
     );
   }
   
