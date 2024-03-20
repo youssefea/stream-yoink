@@ -33,7 +33,7 @@ function generateSVG(text: string, color: string[], backgroundColor: string, siz
           y="${startingY + index * lineHeight}" 
           dominant-baseline="middle" 
           text-anchor="middle" 
-          font-family="Helvetica" 
+          font-family="Arial" 
           font-size="${size[index] || 10}" 
           fill="${fillColor}"
       >
