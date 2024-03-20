@@ -1,5 +1,6 @@
 // app/api/image/route.ts
 import { NextRequest, NextResponse } from 'next/server';
+import sharp from 'sharp';
 
 
 const superfluidLogo = `<path fill-rule="evenodd" clip-rule="evenodd" d="M62.415 22.0661V14.4242H66.1397V22.37C66.1397 23.1611 66.3831 23.7953 66.8703 24.2736C67.3578 24.7517 67.9786 24.9911 68.7328 24.9911C69.4681 24.9911 70.0753 24.7469 70.5536 24.2597C71.0317 23.7725 71.2708 23.1422 71.2708 22.37V14.4242H74.9953V22.0661C74.9953 23.9422 74.4019 25.4692 73.2158 26.6458C72.0294 27.8233 70.5353 28.4117 68.7328 28.4117C66.8933 28.4117 65.3811 27.8278 64.1947 26.6594C63.0081 25.4917 62.415 23.9608 62.415 22.0661Z" fill="#12141E"/>
@@ -55,28 +56,34 @@ function generateSVG(text: string, color: string[], backgroundColor: string, siz
     `;
   }
 
-export async function GET(request: NextRequest) {
-
-  const { searchParams } = request.nextUrl;
-  const text = searchParams.get('text') || 'Default Text';
-  const color = searchParams.get('color')?.split(",") || new Array(10).fill('black');
-  const size = request.nextUrl.searchParams.get('size')?.split(",") || new Array(10).fill('12');
-  const backgroundColor = searchParams.get('background') || 'white';
-
-  // Validate inputs as needed
-  if (!text) {
-    return new NextResponse('Query parameter "text" is required', { status: 400 });
+  export async function GET(request: NextRequest) {
+    const { searchParams } = request.nextUrl;
+    const text = searchParams.get('text') || 'Default Text';
+    const color = searchParams.get('color')?.split(",") || new Array(10).fill('black');
+    const size = request.nextUrl.searchParams.get('size')?.split(",") || new Array(10).fill('12');
+    const backgroundColor = searchParams.get('background') || 'white';
+  
+    // Generate the SVG content
+    const svg = generateSVG(text, color, backgroundColor, size);
+  
+    // Convert SVG buffer to PNG with sharp, specifying higher DPI for better quality
+    const pngBuffer = await sharp(Buffer.from(svg), { density: 300 }) // Increase DPI for better quality
+      .resize({ width: 600 }) // Adjust width as needed, height is auto-scaled to maintain aspect ratio
+      .png({
+        quality: 100, // Set high quality for PNG output
+        compressionLevel: 9 // Use higher compression level for smaller file size with minimal quality loss
+      })
+      .toBuffer();
+  
+    // Return the PNG image in the response
+    return new NextResponse(pngBuffer, {
+      status: 200,
+      headers: {
+        'Content-Type': 'image/png',
+        'Cache-Control': 's-maxage=1, stale-while-revalidate',
+      },
+    });
   }
-
-  const svg = generateSVG(text, color, backgroundColor, size);
-  return new NextResponse(svg, {
-    status: 200,
-    headers: {
-      'Content-Type': 'image/svg+xml',
-      'Cache-Control': 's-maxage=1, stale-while-revalidate',
-    },
-  });
-}
 
 // Force the function to be considered dynamic to bypass any caching
 export const dynamic = 'force-dynamic';
