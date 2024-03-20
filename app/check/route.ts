@@ -25,7 +25,7 @@ init(process.env.AIRSTACK_KEY || "");
 
 const noConnectedString = "https://i.imgur.com/GBYJbwP.png";
 
-const reyoinkedString ="https://i.imgur.com/PQXIuuK.png";
+const reyoinkedString ="https://i.imgur.com/uxo5KUS.png";
 
 function getImgUrl(myString: string) {
   const myStringEncoded = encodeURIComponent(myString);
