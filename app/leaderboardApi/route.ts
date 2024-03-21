@@ -13,12 +13,12 @@ export async function GET(req) {
   noStore();
   try {
     // Fetch the sorted leaderboard data directly from KV
-    const leaderboardDataRaw = await kv.zrange("yoinkedStreams", 0, 10000, {
+    const leaderboardDataRaw : any = await kv.zrange("yoinkedStreams", 0, 10000, {
       withScores: true,
     });
 
     // Process leaderboard data to pair user handles with their scores
-    const leaderboardData = [];
+    const leaderboardData:any = [];
     for (let i = 0; i < leaderboardDataRaw.length; i += 2) {
       leaderboardData.push({
         userHandle: leaderboardDataRaw[i],
@@ -28,10 +28,10 @@ export async function GET(req) {
 
     // Fetch additional data for each user in parallel and handle possible null values
     const enrichedLeaderboardDataPromises = leaderboardData.map(
-      async (entry) => {
+      async (entry:any) => {
         try {
           let userAddress;
-          const initialHandle = entry.userHandle.startsWith("@")
+          const initialHandle = entry.userHandle.toString().startsWith("@")
             ? entry.userHandle.slice(1)
             : entry.userHandle;
           const { data: initialProfileResponse } = await fetchQuery(
@@ -43,7 +43,7 @@ export async function GET(req) {
               ?.userAssociatedAddresses?.[1];
 
           // If the initial attempt fails and the handle originally started with "@"
-          if (!userAddress && entry.userHandle.startsWith("@")) {
+          if (!userAddress && entry.userHandle.toString().startsWith("@")) {
             const modifiedHandle = `${initialHandle}.eth`;
             const { data: modifiedProfileResponse } = await fetchQuery(
               profileQuery(modifiedHandle),
