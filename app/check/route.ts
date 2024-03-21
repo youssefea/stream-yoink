@@ -141,11 +141,14 @@ export async function POST(req) {
 
       if (Number(receiverCurrentFlowRate) > 0) {
         deleteFlow(account.address, currentYoinkerAddress, nonce);
+        
         nonce++;
         //await walletClient.writeContract(deleteStream);
       }
     }
     setFlowrate(newAddress, nonce);
+    const delay = ms => new Promise(res => setTimeout(res, ms));
+    await delay(1000);
     //await walletClient.writeContract(startStream);
   } else if (currentYoinkerAddress.toLowerCase() == newAddress.toLowerCase()) {
     return new NextResponse(
