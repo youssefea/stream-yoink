@@ -40,6 +40,16 @@ query GetAddressesOfFarcasters {
 }
 `;
 
+export const profileQuery = (id) => `
+query GetAddressesOfFarcasters {
+  Socials(input: {filter: {profileName: {_eq: "${id}"}}, blockchain: ethereum}) {
+    Social {
+      userAssociatedAddresses
+    }
+  }
+}
+`;
+
 export const lastYoinkedQuery = (receiverAddress) => `
 query GetLastYoinked {
   account(id: "${account.address.toLowerCase()}") {
@@ -56,6 +66,18 @@ query GetLastYoinked {
   }
 }
 `;
+
+export const totalStreamedQuery = (receiverAddress) => `
+query totalStreamed {
+  accountTokenSnapshots(where: {account: "${account.address.toLowerCase()}"}) {
+    account {
+      outflows(where: {receiver: "${receiverAddress.toLowerCase()}"}) {
+        streamedUntilUpdatedAt
+      }
+    }
+  }
+}
+`
 
 // Function to perform the POST request and handle the response
 export async function fetchSubgraphData(myQuery) {

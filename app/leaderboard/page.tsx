@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 type LeaderboardEntry = {
   userHandle: string;
   score: number;
+  totalStreamed: number; // Adding the new property for total $DEGEN streamed
 };
 
 type CurrentYoinker = {
@@ -21,18 +22,15 @@ export default function LeaderboardPage() {
       try {
         // Fetch leaderboard data
         const leaderboardResponse = await fetch("/leaderboardApi");
-        const leaderboardData: (string | number)[] =
-          await leaderboardResponse.json();
+        const leaderboardData = await leaderboardResponse.json();
 
-        const parsedLeaderboardData: LeaderboardEntry[] = [];
-        for (let i = 0; i < leaderboardData.length; i += 2) {
-          parsedLeaderboardData.push({
-            userHandle: leaderboardData[i] as string,
-            score: leaderboardData[i + 1] as number,
-          });
-        }
-        // Reverse the array to correct the ranking order
-        setLeaderboard(parsedLeaderboardData.reverse());
+        // Parse and sort leaderboard data based on totalStreamed
+        const sortedLeaderboardData = leaderboardData.sort(
+          (a, b) => b.totalStreamed - a.totalStreamed
+        );
+
+        // Update state with sorted data
+        setLeaderboard(sortedLeaderboardData);
 
         // Fetch current yoinker data
         const currentYoinkerResponse = await fetch("/currentYoinkerApi");
@@ -56,7 +54,10 @@ export default function LeaderboardPage() {
         flexDirection: "column",
       }}
     >
-      <a href="https://warpcast.com/superfluid" style={{ textDecoration: "none" }}>
+      <a
+        href="https://warpcast.com/superfluid"
+        style={{ textDecoration: "none" }}
+      >
         <h1
           style={{ color: "#1DB227", fontSize: "3em", marginBottom: "0.5em" }}
         >
@@ -134,6 +135,16 @@ export default function LeaderboardPage() {
             >
               StreamYoinks
             </th>
+            <th
+              style={{
+                border: "1px solid white",
+                textAlign: "center",
+                padding: "8px",
+              }}
+            >
+              Total $DEGEN Streamed
+            </th>{" "}
+            {/* New column for total $DEGEN streamed */}
           </tr>
         </thead>
         <tbody>
@@ -166,13 +177,23 @@ export default function LeaderboardPage() {
               >
                 {entry.score}
               </td>
+              <td
+                style={{
+                  border: "1px solid white",
+                  textAlign: "center",
+                  padding: "8px",
+                }}
+              >
+                {entry.totalStreamed.toLocaleString()}
+              </td>{" "}
+              {/* Display total $DEGEN streamed */}
             </tr>
           ))}
         </tbody>
       </table>
       <br />
       <div>
-      <p style={{ textAlign: "center", lineHeight: "1.5" }}>
+        <p style={{ textAlign: "center", lineHeight: "1.5" }}>
           <a
             href="https://github.com/youssefea/stream-yoink"
             target="_blank"
