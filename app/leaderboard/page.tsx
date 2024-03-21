@@ -166,7 +166,14 @@ export default function LeaderboardPage() {
                   padding: "8px",
                 }}
               >
-                {entry.userHandle}
+                <a
+                  href={`https://warpcast.com/${entry.userHandle}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={{ color: "#007bff", textDecoration: "none" }}
+                >
+                  {entry.userHandle}
+                </a>
               </td>
               <td
                 style={{
