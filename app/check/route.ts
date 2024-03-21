@@ -25,7 +25,7 @@ init(process.env.AIRSTACK_KEY || "");
 
 const noConnectedString = "https://i.imgur.com/GBYJbwP.png";
 
-const reyoinkedString ="https://i.imgur.com/uxo5KUS.png";
+const reyoinkedString ="https://i.imgur.com/jfySrCh.png";
 
 function getImgUrl(myString: string) {
   const myStringEncoded = encodeURIComponent(myString);
@@ -117,7 +117,7 @@ export async function POST(req) {
   const currentYoinkerAddress = fetchDataJson.address;
 
   if (currentYoinkerAddress.toLowerCase() != newAddress.toLowerCase()) {
-    if (Number(lastYoink) + 86400 > now) {
+    if (Number(lastYoink) + 3600 > now) {
       return new NextResponse(
         _html(
           reyoinkedString,
