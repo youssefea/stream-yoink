@@ -50,6 +50,18 @@ query GetAddressesOfFarcasters {
 }
 `;
 
+export const profileQueryLens = (id) => `
+query GetAddressesOfFarcasters {
+  Socials(
+    input: {filter: {profileName: {_eq: "lens/${id}"}}, blockchain: ethereum}
+  ) {
+    Social {
+      userAssociatedAddresses
+    }
+  }
+}
+`;
+
 export const lastYoinkedQuery = (receiverAddress) => `
 query GetLastYoinked {
   account(id: "${account.address.toLowerCase()}") {

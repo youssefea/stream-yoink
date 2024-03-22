@@ -13,12 +13,17 @@ export async function GET(req) {
   noStore();
   try {
     // Fetch the sorted leaderboard data directly from KV
-    const leaderboardDataRaw : any = await kv.zrange("yoinkedStreams", 0, 10000, {
-      withScores: true,
-    });
+    const leaderboardDataRaw: any = await kv.zrange(
+      "yoinkedStreams",
+      0,
+      10000,
+      {
+        withScores: true,
+      }
+    );
 
     // Process leaderboard data to pair user handles with their scores
-    const leaderboardData:any = [];
+    const leaderboardData: any = [];
     for (let i = 0; i < leaderboardDataRaw.length; i += 2) {
       leaderboardData.push({
         userHandle: leaderboardDataRaw[i],
@@ -28,37 +33,12 @@ export async function GET(req) {
 
     // Fetch additional data for each user in parallel and handle possible null values
     const enrichedLeaderboardDataPromises = leaderboardData.map(
-      async (entry:any) => {
+      async (entry: any) => {
         try {
           let userAddress;
-          const initialHandle = entry.userHandle.toString().startsWith("@")
-            ? entry.userHandle.slice(1)
-            : entry.userHandle;
-          const { data: initialProfileResponse } = await fetchQuery(
-            profileQuery(initialHandle),
-            { id: initialHandle }
-          );
-          userAddress =
-            initialProfileResponse?.Socials?.Social?.[0]
-              ?.userAssociatedAddresses?.[1];
+          userAddress=await kv.hget("walletAddresses", entry.userHandle);
 
-          // If the initial attempt fails and the handle originally started with "@"
-          if (!userAddress && entry.userHandle.toString().startsWith("@")) {
-            const modifiedHandle = `${initialHandle}.eth`;
-            const { data: modifiedProfileResponse } = await fetchQuery(
-              profileQuery(modifiedHandle),
-              { id: modifiedHandle }
-            );
-            userAddress =
-              modifiedProfileResponse?.Socials?.Social?.[0]
-                ?.userAssociatedAddresses?.[1];
-
-            if (!userAddress) {
-              // If no address is found even after modification
-              console.error(`No user address found for ${entry.userHandle}`);
-              return { ...entry, totalStreamed: 0 };
-            }
-          } else if (!userAddress) {
+          if (!userAddress) {
             // If no address is found and the handle does not start with "@"
             console.error(`No user address found for ${entry.userHandle}`);
             return { ...entry, totalStreamed: 0 };

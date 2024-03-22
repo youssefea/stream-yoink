@@ -21,6 +21,7 @@ export async function POST(request: NextRequest) {
     // Save the new profileHandle and address for the current yoinker
     await kv.hset('currentYoinker', { profileHandle: profileHandle, address: address});
     await kv.zincrby('yoinkedStreams', 1, profileHandle);
+    await kv.hset("walletAddresses", {[profileHandle]: address});
 
     // Return a success response
     return new NextResponse(JSON.stringify({ message: 'Profile data updated successfully' }), {
