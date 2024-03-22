@@ -1,4 +1,4 @@
-"use client";
+"use client"
 import { useEffect, useState } from "react";
 
 type LeaderboardEntry = {
@@ -13,13 +13,14 @@ type CurrentYoinker = {
 
 export default function LeaderboardPage() {
   const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>([]);
-  const [currentYoinker, setCurrentYoinker] = useState<CurrentYoinker | null>(
-    null
-  );
+  const [currentYoinker, setCurrentYoinker] = useState<CurrentYoinker | null>(null);
+  const [isLoading, setIsLoading] = useState(true); // New state for tracking loading status
 
   useEffect(() => {
     async function fetchData() {
       try {
+        setIsLoading(true); // Start loading
+
         // Fetch leaderboard data
         const leaderboardResponse = await fetch("/leaderboardApi");
         const leaderboardData = await leaderboardResponse.json();
@@ -34,16 +35,33 @@ export default function LeaderboardPage() {
 
         // Fetch current yoinker data
         const currentYoinkerResponse = await fetch("/currentYoinkerApi");
-        const currentYoinkerData: CurrentYoinker =
-          await currentYoinkerResponse.json();
+        const currentYoinkerData: CurrentYoinker = await currentYoinkerResponse.json();
         setCurrentYoinker(currentYoinkerData);
+
+        setIsLoading(false); // End loading
       } catch (error) {
         console.error("Failed to fetch data:", error);
+        setIsLoading(false); // Ensure loading is false in case of error
       }
     }
 
     fetchData();
   }, []);
+
+  if (isLoading) {
+    return (
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          height: "100vh",
+        }}
+      >
+        Hang on fellow StreamYoinker, the Leaderboard is loading...
+      </div>
+    );
+  }
 
   return (
     <div
