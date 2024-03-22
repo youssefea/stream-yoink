@@ -32,7 +32,7 @@ function getImgUrl(myString: string) {
   return `${URL}/imgen?text=${myStringEncoded}&color=black,superfluid,black,black,black&size=10,24,8,8,8,8,8,8,8`;
 }
 
-const flowRate = 130898020000000000;
+const flowRate = 327245050000000000;
 
 const _html = (img, msg, action, url) => `
 <!DOCTYPE html>
