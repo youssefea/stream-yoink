@@ -58,7 +58,7 @@ export default function LeaderboardPage() {
           height: "100vh",
         }}
       >
-        Hang on fellow StreamYoinker, the Leaderboard is loading...
+        Hang on a few seconds fellow StreamYoinker, the Leaderboard is loading...
       </div>
     );
   }
