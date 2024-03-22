@@ -16,7 +16,7 @@ query isFollowing {
         followingProfileId
         followerProfileId
         followerAddress {
-          socials {
+          socials(input: {filter: {dappName: {_eq: farcaster}}}) {
             profileHandle
             profileName
             dappName
