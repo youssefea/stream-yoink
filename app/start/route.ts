@@ -92,12 +92,10 @@ export async function POST(req) {
   const socials = results2.Socials.Social;
   const newAddress = socials[0].userAssociatedAddresses[1];
 
-  if (data1 != null && data1[0].isFollowing != null) {
-    if (!data1[0].isFollowing) {
-      return new NextResponse(
-        _html(notFollowingString, "🎩 Retry", "post", `${URL}`)
-      );
-    }
+  if (data1 != null && data1?.[0]?.isFollowing) {
+    return new NextResponse(
+      _html(notFollowingString, "🎩 Retry", "post", `${URL}`)
+    );
   }
 
   const fetchDataTotalStreams = await fetch(`${URL}/totalYoinked`);
