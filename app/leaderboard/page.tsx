@@ -14,6 +14,7 @@ type CurrentYoinker = {
 export default function LeaderboardPage() {
   const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>([]);
   const [currentYoinker, setCurrentYoinker] = useState<CurrentYoinker | null>(null);
+  const [totalYoinked, setTotalYoinked] = useState<number>(0); // New state for total $DEGEN streamed
   const [isLoading, setIsLoading] = useState(true); // New state for tracking loading status
 
   useEffect(() => {
@@ -37,6 +38,10 @@ export default function LeaderboardPage() {
         const currentYoinkerResponse = await fetch("/currentYoinkerApi");
         const currentYoinkerData: CurrentYoinker = await currentYoinkerResponse.json();
         setCurrentYoinker(currentYoinkerData);
+
+        const totalYoinkedResponse = await fetch("/totalYoinked");
+        const totalYoinkedData = await totalYoinkedResponse.json();
+        setTotalYoinked(totalYoinkedData.totalScore);
 
         setIsLoading(false); // End loading
       } catch (error) {
@@ -104,6 +109,8 @@ export default function LeaderboardPage() {
           StreamYoink
         </a>{" "}
         now and start earning 🎩$DEGEN every second.
+        <br/>
+        The Stream has now been yoinked {totalYoinked} times.
       </p>
       {currentYoinker && (
         <div style={{ marginBottom: "20px" }}>
