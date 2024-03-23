@@ -209,7 +209,7 @@ export default function LeaderboardPage() {
                   padding: "8px",
                 }}
               >
-                {entry.totalStreamed.toLocaleString()}
+                {entry.totalStreamed}
               </td>{" "}
               {/* Display total $DEGEN streamed */}
             </tr>

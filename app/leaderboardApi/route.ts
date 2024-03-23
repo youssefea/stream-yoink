@@ -44,7 +44,7 @@ export async function GET(req) {
             return { ...entry, totalStreamed: 0 };
           }
 
-          const subgraphResponse: any = await fetchSubgraphData(
+          /*const subgraphResponse: any = await fetchSubgraphData(
             totalStreamedQuery(userAddress)
           );
           const outflows =
@@ -61,6 +61,8 @@ export async function GET(req) {
               acc + parseInt(formatEther(curr.streamedUntilUpdatedAt), 10),
             0
           );
+          await kv.hset("balances", {[entry.userHandle]: totalStreamed});*/
+          const totalStreamed=await kv.hget("balances", entry.userHandle);
 
           return { ...entry, totalStreamed };
         } catch (error) {
