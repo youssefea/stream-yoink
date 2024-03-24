@@ -28,8 +28,10 @@ const USDCxAddress = process.env.SUPER_TOKEN_ADDRESS as `0x${string}`;
 
 const notFollowingString = `https://i.imgur.com/V2MXezK.png`;
 
-const welcomeString = (yoinker, totalLeft) =>  `_${yoinker}_has the stream ! _${totalLeft} $DEGEN left in the pot`;
-const gameEnded= "_Too late!_No more $DEGEN left in the pot_Follow @superfluid for more $DEGEN streams!_";
+const welcomeString = (yoinker, totalLeft) =>
+  `_${yoinker}_has the stream ! _${totalLeft} $DEGEN left in the pot`;
+const gameEnded =
+  "_Too late!_No more $DEGEN left in the pot_Follow @superfluid for more $DEGEN streams!_";
 
 function getImgUrl(myString: string) {
   const myStringEncoded = encodeURIComponent(myString);
@@ -58,15 +60,6 @@ const _html = (img, msg, action, url) => `
 export async function POST(req) {
   const data = await req.json();
 
-  return new NextResponse(
-    _html(
-      getImgUrl(gameEnded),
-      "🎩 Retry",
-      "post",
-      `${URL}/`
-    )
-  );
-
   const { untrustedData } = data;
   const { fid } = untrustedData;
 
@@ -92,7 +85,7 @@ export async function POST(req) {
   const socials = results2.Socials.Social;
   const newAddress = socials[0].userAssociatedAddresses[1];
 
-  if (data1 != null && data1?.[0]?.isFollowing) {
+  if (data1 != null && !data1?.[0]?.isFollowing) {
     return new NextResponse(
       _html(notFollowingString, "🎩 Retry", "post", `${URL}`)
     );
@@ -113,6 +106,12 @@ export async function POST(req) {
   });
 
   const totalLeft = Number(formatEther(balanceOfAccount));
+
+  if (totalLeft <= 10000) {
+    return new NextResponse(
+      _html(getImgUrl(gameEnded), "🎩 Retry", "post", `${URL}/`)
+    );
+  }
 
   return new NextResponse(
     _html(

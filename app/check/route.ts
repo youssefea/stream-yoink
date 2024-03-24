@@ -19,7 +19,7 @@ const URL =
 
 // USDC contract address on Base
 const contractAddress = "0xcfA132E353cB4E398080B9700609bb008eceB125";
-const USDCxAddress = process.env.SUPER_TOKEN_ADDRESS as `0x${string}`;
+const superTokenAddress = process.env.SUPER_TOKEN_ADDRESS as `0x${string}`;
 
 init(process.env.AIRSTACK_KEY || "");
 
@@ -61,7 +61,7 @@ async function deleteFlow(_from, _to, _nonce){
     functionName: "deleteFlow",
     account,
     nonce: _nonce,
-    args: [USDCxAddress, _from, _to, "0x0"],
+    args: [superTokenAddress, _from, _to, "0x0"],
   });
 }
 
@@ -72,7 +72,7 @@ async function setFlowrate(_to, _nonce){
     functionName: "setFlowrate",
     account,
     nonce: _nonce,
-    args: [USDCxAddress, _to, flowRate],
+    args: [superTokenAddress, _to, flowRate],
   });
 }
 
@@ -136,7 +136,7 @@ export async function POST(req) {
         address: contractAddress,
         abi: ABI,
         functionName: "getFlowrate",
-        args: [USDCxAddress, account.address, currentYoinkerAddress],
+        args: [superTokenAddress, account.address, currentYoinkerAddress],
       });
 
       if (Number(receiverCurrentFlowRate) > 0) {

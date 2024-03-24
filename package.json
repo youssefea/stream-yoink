@@ -9,7 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "@airstack/frames": "^1.0.19",
+    "@airstack/frames": "1.0.19",
     "@airstack/node": "^0.0.5",
     "@vercel/kv": "^1.0.1",
     "buffer": "^6.0.3",
