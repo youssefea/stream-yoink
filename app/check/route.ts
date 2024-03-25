@@ -9,8 +9,6 @@ import {
 import { init, fetchQuery } from "@airstack/node";
 import { account, walletClient, publicClient } from "./config";
 import ABI from "./abi.json";
-import ERC20ABI from "./erc20abi.json";
-import { formatEther } from "viem";
 
 const URL =
   process.env.ENVIRONMENT === "local"

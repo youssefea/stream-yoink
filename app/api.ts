@@ -9,7 +9,7 @@ const URL =
 export const followingQuery = (id) => `
 query isFollowing {
   Wallet(input: {identity: "fc_fid:${id}", blockchain: ethereum}) {
-    socialFollowers(input: {filter: {identity: {_in: ["fc_fid:315653"]}}}) {
+    socialFollowers(input: {filter: {identity: {_in: ["fc_fid:${process.env.FID}"]}}}) {
       Follower {
         dappName
         dappSlug

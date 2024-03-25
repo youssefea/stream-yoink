@@ -70,7 +70,7 @@ export async function POST(req) {
 
   const input: CheckIsFollowingFarcasterUserInput = {
     fid: fid,
-    isFollowing: [315653],
+    isFollowing: [Number(process.env.FID)],
   };
   const { data: data1, error: error1 }: CheckIsFollowingFarcasterUserOutput =
     await checkIsFollowingFarcasterUser(input);
@@ -107,7 +107,7 @@ export async function POST(req) {
 
   const totalLeft = Number(formatEther(balanceOfAccount));
 
-  if (totalLeft <= 10000) {
+  if (totalLeft <= 1) {
     return new NextResponse(
       _html(getImgUrl(gameEnded), "🎩 Retry", "post", `${URL}/`)
     );
