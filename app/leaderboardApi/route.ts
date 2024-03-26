@@ -12,9 +12,9 @@ init(process.env.AIRSTACK_KEY || "");
 export async function GET(req) {
   noStore();
   try {
-    // Fetch the sorted leaderboard data directly from KV
+    // Fetch the sorted leaderboard data by balances directly from KV
     const leaderboardDataRaw: any = await kv.zrange(
-      "yoinkedStreams",
+      "sortedBalances",
       0,
       10000,
       {
@@ -22,12 +22,12 @@ export async function GET(req) {
       }
     );
 
-    // Process leaderboard data to pair user handles with their scores
+    // Process leaderboard data to pair user handles with their balances
     const leaderboardData: any = [];
     for (let i = 0; i < leaderboardDataRaw.length; i += 2) {
       leaderboardData.push({
         userHandle: leaderboardDataRaw[i],
-        score: leaderboardDataRaw[i + 1],
+        totalStreamed: leaderboardDataRaw[i + 1],
       });
     }
 
@@ -36,19 +36,18 @@ export async function GET(req) {
       async (entry: any) => {
         try {
           let userAddress;
-          userAddress=await kv.hget("walletAddresses", entry.userHandle);
+          userAddress = await kv.hget("walletAddresses", entry.userHandle);
 
           if (!userAddress) {
-            // If no address is found and the handle does not start with "@"
             console.error(`No user address found for ${entry.userHandle}`);
-            return { ...entry, totalStreamed: 0 };
+            return { ...entry, score: 0 };
           }
-          const totalStreamed=await kv.hget("balances", entry.userHandle);
+          const score: any = await kv.zscore("yoinkedStreams", entry.userHandle);
 
-          return { ...entry, totalStreamed };
+          return { ...entry, score };
         } catch (error) {
           console.error(`Error fetching data for ${entry.userHandle}:`, error);
-          return { ...entry, totalStreamed: 0 }; // Fallback to 0 in case of any error
+          return { ...entry, score: 0 }; // Fallback to 0 in case of any error
         }
       }
     );
@@ -57,8 +56,11 @@ export async function GET(req) {
       enrichedLeaderboardDataPromises
     );
 
-    // Return the enriched leaderboard data with NextResponse
-    return new NextResponse(JSON.stringify(enrichedLeaderboardData), {
+    // Sort the enriched data by balance (Note: balance may need to be converted from string to number if necessary)
+    const finalLeaderboardData= enrichedLeaderboardData.reverse();
+
+    // Return the enriched and sorted leaderboard data with NextResponse
+    return new NextResponse(JSON.stringify(finalLeaderboardData), {
       status: 200,
       headers: {
         "Content-Type": "application/json",

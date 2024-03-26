@@ -3,8 +3,8 @@ import { useEffect, useState } from "react";
 
 type LeaderboardEntry = {
   userHandle: string;
-  score: number;
-  totalStreamed: number; // Adding the new property for total $DEGEN streamed
+  score: number; // You might want to rename or remove this if it's no longer relevant
+  totalStreamed: number; // Total $DEGEN streamed
 };
 
 type CurrentYoinker = {
@@ -14,8 +14,8 @@ type CurrentYoinker = {
 export default function LeaderboardPage() {
   const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>([]);
   const [currentYoinker, setCurrentYoinker] = useState<CurrentYoinker | null>(null);
-  const [totalYoinked, setTotalYoinked] = useState<number>(0); // New state for total $DEGEN streamed
-  const [isLoading, setIsLoading] = useState(true); // New state for tracking loading status
+  const [totalYoinked, setTotalYoinked] = useState<number>(0);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     async function fetchData() {
@@ -26,13 +26,8 @@ export default function LeaderboardPage() {
         const leaderboardResponse = await fetch("/leaderboardApi");
         const leaderboardData = await leaderboardResponse.json();
 
-        // Parse and sort leaderboard data based on totalStreamed
-        const sortedLeaderboardData = leaderboardData.sort(
-          (a, b) => b.totalStreamed - a.totalStreamed
-        );
-
-        // Update state with sorted data
-        setLeaderboard(sortedLeaderboardData);
+        // Update state with received data, no need for sorting
+        setLeaderboard(leaderboardData);
 
         // Fetch current yoinker data
         const currentYoinkerResponse = await fetch("/currentYoinkerApi");
@@ -169,7 +164,6 @@ export default function LeaderboardPage() {
             >
               Total $DEGEN Streamed
             </th>{" "}
-            {/* New column for total $DEGEN streamed */}
           </tr>
         </thead>
         <tbody>
@@ -218,7 +212,6 @@ export default function LeaderboardPage() {
               >
                 {entry.totalStreamed}
               </td>{" "}
-              {/* Display total $DEGEN streamed */}
             </tr>
           ))}
         </tbody>
