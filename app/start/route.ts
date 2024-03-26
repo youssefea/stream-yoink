@@ -52,6 +52,9 @@ const _html = (img, msg, action, url) => `
   </head>
 </html>
 `;
+
+const minBalance = 5000;
+
 export async function POST(req) {
   const data = await req.json();
 
@@ -102,7 +105,7 @@ export async function POST(req) {
 
   const totalLeft = Number(formatEther(balanceOfAccount));
 
-  if (totalLeft <= 5000) {
+  if (totalLeft <= minBalance) {
     return new NextResponse(
       _html(getImgUrl(gameEnded), "🎩 Retry", "post", `${URL}/`)
     );

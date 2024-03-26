@@ -23,6 +23,8 @@ const reyoinkedString ="https://i.imgur.com/jfySrCh.png";
 
 const flowRate = 327245050000000000;
 
+const coolDown = 3600;
+
 const _html = (img, msg, action, url) => `
 <!DOCTYPE html>
 <html>
@@ -106,7 +108,7 @@ export async function POST(req) {
   const currentYoinkerAddress = fetchDataJson.address;
 
   if (currentYoinkerAddress.toLowerCase() != newAddress.toLowerCase()) {
-    if (Number(lastYoink) + 3600 > now) {
+    if (Number(lastYoink) + coolDown > now) {
       return new NextResponse(
         _html(
           reyoinkedString,
