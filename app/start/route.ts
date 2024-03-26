@@ -6,7 +6,6 @@ import {
   fetchSubgraphData,
 } from "../api";
 import { init, fetchQuery } from "@airstack/node";
-import { kv } from "@vercel/kv";
 import { account, walletClient, publicClient } from "./config";
 import ERC20ABI from "./erc20abi.json";
 import { formatEther } from "viem";
@@ -16,11 +15,7 @@ import {
   CheckIsFollowingFarcasterUserInput,
   CheckIsFollowingFarcasterUserOutput,
 } from "@airstack/frames";
-
-const URL =
-  process.env.ENVIRONMENT === "local"
-    ? process.env.LOCALHOST
-    : process.env.PROD_URL;
+import {URL} from "./../../constants"
 
 init(process.env.AIRSTACK_KEY || "");
 
@@ -107,7 +102,7 @@ export async function POST(req) {
 
   const totalLeft = Number(formatEther(balanceOfAccount));
 
-  if (totalLeft <= 1) {
+  if (totalLeft <= 5000) {
     return new NextResponse(
       _html(getImgUrl(gameEnded), "🎩 Retry", "post", `${URL}/`)
     );

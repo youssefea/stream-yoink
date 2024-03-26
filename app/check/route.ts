@@ -9,11 +9,7 @@ import {
 import { init, fetchQuery } from "@airstack/node";
 import { account, walletClient, publicClient } from "./config";
 import ABI from "./abi.json";
-
-const URL =
-  process.env.ENVIRONMENT === "local"
-    ? process.env.LOCALHOST
-    : process.env.PROD_URL;
+import {URL} from "./../../constants"
 
 // USDC contract address on Base
 const contractAddress = "0xcfA132E353cB4E398080B9700609bb008eceB125";
