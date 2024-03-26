@@ -43,25 +43,6 @@ export async function GET(req) {
             console.error(`No user address found for ${entry.userHandle}`);
             return { ...entry, totalStreamed: 0 };
           }
-
-          /*const subgraphResponse: any = await fetchSubgraphData(
-            totalStreamedQuery(userAddress)
-          );
-          const outflows =
-            subgraphResponse?.data?.accountTokenSnapshots?.[0]?.account
-              ?.outflows;
-
-          if (!outflows) {
-            console.error(`No outflows found for ${entry.userHandle}`);
-            return { ...entry, totalStreamed: 0 }; // Fallback to 0 if outflows are not found
-          }
-
-          const totalStreamed = outflows.reduce(
-            (acc, curr) =>
-              acc + parseInt(formatEther(curr.streamedUntilUpdatedAt), 10),
-            0
-          );
-          await kv.hset("balances", {[entry.userHandle]: totalStreamed});*/
           const totalStreamed=await kv.hget("balances", entry.userHandle);
 
           return { ...entry, totalStreamed };

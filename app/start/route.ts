@@ -26,7 +26,7 @@ init(process.env.AIRSTACK_KEY || "");
 
 const USDCxAddress = process.env.SUPER_TOKEN_ADDRESS as `0x${string}`;
 
-const notFollowingString = `https://i.imgur.com/V2MXezK.png`;
+const notFollowing = `https://i.imgur.com/V2MXezK.png`;
 
 const welcomeString = (yoinker, totalLeft) =>
   `_${yoinker}_has the stream ! _${totalLeft} $DEGEN left in the pot`;
@@ -87,7 +87,7 @@ export async function POST(req) {
 
   if (data1 != null && !data1?.[0]?.isFollowing) {
     return new NextResponse(
-      _html(notFollowingString, "🎩 Retry", "post", `${URL}`)
+      _html(notFollowing, "🎩 Retry", "post", `${URL}`)
     );
   }
 

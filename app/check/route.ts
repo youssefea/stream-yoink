@@ -25,11 +25,6 @@ const noConnectedString = "https://i.imgur.com/GBYJbwP.png";
 
 const reyoinkedString ="https://i.imgur.com/jfySrCh.png";
 
-function getImgUrl(myString: string) {
-  const myStringEncoded = encodeURIComponent(myString);
-  return `${URL}/imgen?text=${myStringEncoded}&color=black,superfluid,black,black,black&size=10,24,8,8,8,8,8,8,8`;
-}
-
 const flowRate = 327245050000000000;
 
 const _html = (img, msg, action, url) => `
