@@ -13,7 +13,6 @@
     "@airstack/node": "^0.0.5",
     "@vercel/kv": "^1.0.1",
     "buffer": "^6.0.3",
-    "canvas": "^2.11.2",
     "ethers": "^6.11.0",
     "gifencoder": "^2.0.1",
     "next": "^14.1.4",
