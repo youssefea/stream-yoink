@@ -13,7 +13,7 @@ export async function GET() {
     let profileHandle = await kv.hget("currentYoinker", "profileHandle");
     let address = await kv.hget("currentYoinker", "address");
 
-    // If profileHandle is not found, return a meaningful error response
+    // If profileHandle is not found, return a fake profileHandle and address
     if (!profileHandle) {
       profileHandle = "fakeHandle";
       address = "0xfabababababababababa740f03963281634847ba";
