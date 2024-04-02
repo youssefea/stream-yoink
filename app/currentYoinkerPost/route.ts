@@ -3,6 +3,12 @@ import { NextRequest, NextResponse } from "next/server";
 import { kv } from "@vercel/kv";
 import { fetchSubgraphData, totalStreamedQuery } from "../api";
 import { formatEther } from "viem";
+import {URL} from "../../constants";
+
+type OldYoinker = {
+  profileHandle: string;
+  address: string;
+};
 
 export async function POST(request: NextRequest) {
   try {
@@ -23,9 +29,11 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    //Update the balances for the old yoinker
-    const oldYoinker = await kv.hget("currentYoinker", "profileHandle");
-    const oldAddress = await kv.hget("currentYoinker", "address");
+    // Get Old Yoiner data
+    const currentYoinkerResponse = await fetch(`${URL}/currentYoinkerApi`);
+    const oldYoinkerData:OldYoinker = await currentYoinkerResponse.json();
+    const oldYoinker = oldYoinkerData.profileHandle;
+    const oldAddress = oldYoinkerData.address;
     const subgraphResponse: any = await fetchSubgraphData(
       totalStreamedQuery(oldAddress)
     );
