@@ -6,6 +6,8 @@ const URL =
     ? process.env.LOCALHOST
     : process.env.PROD_URL;
 
+const tokenAddress=process.env.SUPER_TOKEN_ADDRESS;
+
 export const followingQuery = (id) => `
 query isFollowing {
   Wallet(input: {identity: "fc_fid:${id}", blockchain: ethereum}) {
@@ -66,7 +68,7 @@ export const lastYoinkedQuery = (receiverAddress) => `
 query GetLastYoinked {
   account(id: "${account.address.toLowerCase()}") {
     outflows(
-      where: {receiver: "${receiverAddress.toLowerCase()}", token_contains_nocase: "0x1efF3Dd78F4A14aBfa9Fa66579bD3Ce9E1B30529"}
+      where: {receiver: "${receiverAddress.toLowerCase()}", token_contains_nocase: "${tokenAddress}"}
       orderBy: updatedAtTimestamp
       orderDirection: desc
     ) {
