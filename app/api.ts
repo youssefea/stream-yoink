@@ -8,6 +8,8 @@ const URL =
 
 const tokenAddress=process.env.SUPER_TOKEN_ADDRESS;
 
+const subgraphURL = "https://base-mainnet.subgraph.x.superfluid.dev/";
+
 export const followingQuery = (id) => `
 query isFollowing {
   Wallet(input: {identity: "fc_fid:${id}", blockchain: ethereum}) {
@@ -100,7 +102,7 @@ export async function fetchSubgraphData(myQuery) {
   };
 
   try {
-    const response = await fetch("https://base-mainnet.subgraph.x.superfluid.dev/", {
+    const response = await fetch(subgraphURL, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
